@@ -31,6 +31,13 @@ jobs:
           flutter-version: '3.24.0'
           cache: true
 
+      - name: ⚙️ Generate & Configure Gradle 8.2 Wrapper
+        working-directory: android
+        run: |
+          gradle wrapper --gradle-version 8.2 --distribution-type all || true
+          chmod +x gradlew || true
+          ./gradlew --version
+
       - name: 📦 Install Flutter Dependencies
         run: flutter pub get
 
