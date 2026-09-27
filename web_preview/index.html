@@ -516,10 +516,18 @@
       <div class="share-photos" id="shareCardPhotos" style="display:none;"></div>
       <div class="share-footer">NikahBureau Pro · Confidential Rishta Profile</div>
     </div>
-    <div class="share-btn-row">
-      <button style="background:#25D366;color:#fff;" onclick="sendToWhatsApp()">💬 Share on WhatsApp</button>
-      <button style="background:#1e40af;color:#fff;" onclick="downloadShareCard()">⬇️ Download Card</button>
-      <button style="background:#334155;color:#fff;" onclick="closeShareCard()">✕ Close</button>
+    <div class="share-btn-row" style="flex-direction:column;gap:8px;">
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button style="background:#25D366;color:#fff;" onclick="sendToWhatsApp()">💬 Share Profile on WhatsApp</button>
+        <button style="background:#1e40af;color:#fff;" onclick="downloadShareCard()">⬇️ Download Profile (.txt)</button>
+      </div>
+      <div id="sharePhotoBtns" style="display:none;">
+        <div style="text-align:center;font-size:11px;font-weight:700;color:#475569;margin-bottom:6px;">📸 Share Photos Separately:</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;" id="sharePhotoBtnsList"></div>
+      </div>
+      <div style="text-align:center;">
+        <button style="background:#334155;color:#fff;" onclick="closeShareCard()">✕ Close</button>
+      </div>
     </div>
   </div>
 
@@ -1107,7 +1115,7 @@
         ${row('Reference', c.agentReferenceName)}
       `;
 
-      // Photos
+      // Photos embedded in card preview
       const photosEl = document.getElementById('shareCardPhotos');
       if (c.photos && c.photos.length > 0) {
         photosEl.style.display = 'flex';
@@ -1117,8 +1125,44 @@
       }
 
       document.getElementById('shareCardContainer').classList.add('open');
-      // Store current share id
       document.getElementById('shareCardContainer').dataset.cid = id;
+
+      // Populate individual photo share/download buttons
+      const photoBtnsSection = document.getElementById('sharePhotoBtns');
+      const photoBtnsList = document.getElementById('sharePhotoBtnsList');
+      if (c.photos && c.photos.length > 0) {
+        photoBtnsSection.style.display = 'block';
+        photoBtnsList.innerHTML = c.photos.map((p, idx) => `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            <img src="${p}" style="width:54px;height:60px;border-radius:8px;object-fit:cover;border:2px solid #e2e8f0;">
+            <span style="font-size:9px;font-weight:700;color:#475569;">Photo ${idx+1}</span>
+            <button onclick="sharePhotoByIdx(${idx})"
+              style="background:#25D366;color:#fff;border:none;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;">
+              📤 Share
+            </button>
+            <button onclick="downloadPhotoByIdx(${idx})"
+              style="background:#1e40af;color:#fff;border:none;padding:3px 6px;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;">
+              ⬇️ Save
+            </button>
+          </div>`).join('');
+      } else {
+        photoBtnsSection.style.display = 'none';
+        photoBtnsList.innerHTML = '';
+      }
+    }
+
+    function sharePhotoByIdx(idx) {
+      const id = document.getElementById('shareCardContainer').dataset.cid;
+      const c = candidates.find(x => x.id === id);
+      if (!c || !c.photos || !c.photos[idx]) return;
+      sharePhotoNative(c.photos[idx], idx, c.name);
+    }
+
+    function downloadPhotoByIdx(idx) {
+      const id = document.getElementById('shareCardContainer').dataset.cid;
+      const c = candidates.find(x => x.id === id);
+      if (!c || !c.photos || !c.photos[idx]) return;
+      downloadPhoto(c.photos[idx], idx, c.name);
     }
 
     function closeShareCard() {
@@ -1129,6 +1173,9 @@
       const id = document.getElementById('shareCardContainer').dataset.cid;
       const c = candidates.find(x => x.id === id);
       if (!c) return;
+      const photoNote = (c.photos && c.photos.length > 0)
+        ? `\n📸 _${c.photos.length} photo(s) available — download separately from the app._`
+        : '';
       const text = `*💍 NikahBureau Pro — Rishta Profile*\n\n` +
         `*Name:* ${c.name}\n` +
         `*Gender:* ${c.gender}\n` +
@@ -1142,18 +1189,53 @@
         (c.occupation ? `*Occupation:* ${c.occupation}\n` : '') +
         (c.fatherName ? `*Father:* ${c.fatherName}\n` : '') +
         (c.fatherOcc ? `*Father's Occ:* ${c.fatherOcc}\n` : '') +
+        (c.motherName ? `*Mother:* ${c.motherName}\n` : '') +
         (c.city ? `*City:* ${c.city}\n` : '') +
+        (c.address ? `*Address:* ${c.address}\n` : '') +
         (c.contactNumber ? `*Contact:* ${c.contactNumber}\n` : '') +
-        `*Reference:* ${c.agentReferenceName}\n\n` +
-        `_Shared via NikahBureau Pro · Confidential_`;
+        `*Reference:* ${c.agentReferenceName}\n` +
+        photoNote + `\n\n_Shared via NikahBureau Pro · Confidential_`;
 
       const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
     }
 
+    // Download a single photo as PNG to device, then user can forward on WhatsApp
+    function downloadPhoto(dataUrl, idx, candidateName) {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `${(candidateName||'Candidate').replace(/\s+/g,'_')}_Photo${idx+1}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Try Web Share API (works on Android Chrome for sharing images)
+    async function sharePhotoNative(dataUrl, idx, candidateName) {
+      if (navigator.share && navigator.canShare) {
+        try {
+          // Convert dataURL to Blob
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          const ext = blob.type.includes('png') ? 'png' : 'jpg';
+          const fileName = `${(candidateName||'Candidate').replace(/\s+/g,'_')}_Photo${idx+1}.${ext}`;
+          const file = new File([blob], fileName, { type: blob.type });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: `${candidateName} — Rishta Photo ${idx+1}`,
+              text: `Photo ${idx+1} of ${candidateName} — Shared via NikahBureau Pro`
+            });
+            return;
+          }
+        } catch(e) { console.log('Web Share failed, falling back to download'); }
+      }
+      // Fallback: download the photo
+      downloadPhoto(dataUrl, idx, candidateName);
+      alert(`📸 Photo ${idx+1} downloaded! Open your Downloads folder and forward it on WhatsApp manually.`);
+    }
+
     function downloadShareCard() {
-      const card = document.getElementById('shareCard');
-      // Use html2canvas if available, else generate text file
       const id = document.getElementById('shareCardContainer').dataset.cid;
       const c = candidates.find(x => x.id === id);
       if (!c) return;

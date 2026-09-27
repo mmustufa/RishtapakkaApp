@@ -17,6 +17,24 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
+      - name: 🔖 Generate Build Version
+        id: version
+        run: |
+          # Read version from pubspec.yaml  e.g. "1.2.0+3"
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //')
+          APP_VERSION=$(echo "$PUBSPEC_VERSION" | cut -d'+' -f1)
+          BUILD_NUMBER=$(echo "$PUBSPEC_VERSION" | cut -d'+' -f2)
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          DATE=$(date +'%Y%m%d')
+          RELEASE_TAG="v${APP_VERSION}-build${BUILD_NUMBER}-${DATE}"
+          APK_NAME="NikahBureau-Pro-v${APP_VERSION}.apk"
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
+          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+          echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_ENV
+          echo "✅ Version: $APP_VERSION | Build: $BUILD_NUMBER | Tag: $RELEASE_TAG"
+
       - name: ☕ Setup Java (JDK 17)
         uses: actions/setup-java@v5
         with:
@@ -35,36 +53,49 @@ jobs:
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
           flutter pub get
 
-      - name: 🔨 Compile Release APK
-        run: flutter build apk --release
+      - name: 🔨 Compile Release APK (v${{ env.APP_VERSION }})
+        run: flutter build apk --release --build-name=${{ env.APP_VERSION }} --build-number=${{ env.BUILD_NUMBER }}
 
-      - name: 📋 Prepare APK for Distribution
+      - name: 📋 Prepare Versioned APK
         run: |
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-release.apk dist/NikahBureau-Pro-Release.apk
+          cp build/app/outputs/flutter-apk/app-release.apk dist/${{ env.APK_NAME }}
+          echo "📦 APK ready: ${{ env.APK_NAME }}"
           ls -lh dist/
 
-      - name: 📤 Upload APK Artifact (Direct Download Link)
+      - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: NikahBureau-Pro-Release-APK
-          path: dist/NikahBureau-Pro-Release.apk
+          name: ${{ env.APK_NAME }}
+          path: dist/${{ env.APK_NAME }}
           retention-days: 30
 
-      - name: 🚀 Publish GitHub Release (Direct Downloadable Link for WhatsApp)
+      - name: 🚀 Publish GitHub Release with Versioned APK
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         with:
-          tag_name: v1.0.0-apk
-          name: "NikahBureau Pro — Android APK (v1.0.0)"
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: "NikahBureau Pro v${{ env.APP_VERSION }} — Android APK"
           body: |
-            ### 📱 Standalone Android APK for WhatsApp & Direct Distribution
-            
-            This APK is ready to install directly on Android phones.
-            
-            - **App Name:** NikahBureau Pro (Rishta Agent Manager)
-            - **Build Type:** Release APK
-            - **Install Guide:** Download `NikahBureau-Pro-Release.apk` and send it over WhatsApp or open directly on Android.
-          files: dist/NikahBureau-Pro-Release.apk
+            ## 📱 NikahBureau Pro v${{ env.APP_VERSION }} — Rishta Agent App
+
+            **Build:** #${{ env.BUILD_NUMBER }} · **Commit:** `${{ env.SHORT_SHA }}` · **Date:** ${{ github.event.head_commit.timestamp }}
+
+            ### ✨ What's New in v${{ env.APP_VERSION }}
+            - 🔍 **Improved Smart OCR Parser** — Label-based extraction for Name, Height (all formats), DOB, Father/Mother details
+            - 📸 **Photo Upload** — Upload 1–3 candidate photos shown in profile cards and full profile view
+            - 👤 **Full Profile View** — Complete biodata modal with Date of Birth, profile picture, family background, address
+            - 💬 **WhatsApp Share** — One-tap text profile sharing on WhatsApp with all biodata fields
+            - ⬇️ **Download Profile Card** — Save candidate profile as a text file
+            - 🎯 **Height parsing** — Handles `5.8 ft`, `5'11"`, `5 ft 5 inches`, `155 cm` formats
+
+            ### 📲 Install Guide
+            1. Download **`${{ env.APK_NAME }}`** below
+            2. Send it on WhatsApp to your contacts
+            3. On Android: tap the received file → **Install**
+            4. Allow "Install from Unknown Sources" if prompted
+
+            > ⚠️ This APK is for direct bureau-to-bureau distribution only. Not for Play Store.
+          files: dist/${{ env.APK_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
