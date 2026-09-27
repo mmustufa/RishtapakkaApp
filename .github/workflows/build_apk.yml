@@ -27,19 +27,13 @@ jobs:
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
           flutter-version: '3.24.0'
           cache: true
 
-      - name: ⚙️ Generate & Configure Gradle 8.2 Wrapper
-        working-directory: android
+      - name: ⚙️ Setup Android Configuration
         run: |
-          gradle wrapper --gradle-version 8.2 --distribution-type all || true
-          chmod +x gradlew || true
-          ./gradlew --version
-
-      - name: 📦 Install Flutter Dependencies
-        run: flutter pub get
+          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+          flutter pub get
 
       - name: 🔨 Compile Release APK
         run: flutter build apk --release
