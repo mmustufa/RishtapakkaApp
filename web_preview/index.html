@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NikahBureau Pro — Muslim Marriage Agent App</title>
+  <title>NikahPakka Pro — Muslim Marriage Agent App</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -226,7 +226,7 @@
   <!-- Top Bar -->
   <div class="preview-bar">
     <h1>
-      <span>💍 NikahBureau Pro</span>
+      <span>💍 NikahPakka Pro</span>
       <span class="badge-offline">⚡ 100% Offline App</span>
     </h1>
     <div class="mode-toggle">
@@ -243,7 +243,7 @@
     <div class="mobile-header">
       <div class="header-top">
         <div>
-          <div class="header-brand">NikahBureau Local</div>
+          <div class="header-brand">NikahPakka Local</div>
           <div class="header-subtitle">Rishta & Matrimonial Management</div>
         </div>
         <span class="badge-offline">Local SQLite</span>
@@ -514,7 +514,7 @@
       </div>
       <div class="share-card-body" id="shareCardBody"></div>
       <div class="share-photos" id="shareCardPhotos" style="display:none;"></div>
-      <div class="share-footer">NikahBureau Pro · Confidential Rishta Profile</div>
+      <div class="share-footer">NikahPakka Pro · Confidential Rishta Profile</div>
     </div>
     <div class="share-btn-row" style="flex-direction:column;gap:8px;">
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
@@ -1176,7 +1176,7 @@
       const photoNote = (c.photos && c.photos.length > 0)
         ? `\n📸 _${c.photos.length} photo(s) available — download separately from the app._`
         : '';
-      const text = `*💍 NikahBureau Pro — Rishta Profile*\n\n` +
+      const text = `*💍 NikahPakka Pro — Rishta Profile*\n\n` +
         `*Name:* ${c.name}\n` +
         `*Gender:* ${c.gender}\n` +
         (c.dob ? `*Date of Birth:* ${c.dob}\n` : '') +
@@ -1194,7 +1194,7 @@
         (c.address ? `*Address:* ${c.address}\n` : '') +
         (c.contactNumber ? `*Contact:* ${c.contactNumber}\n` : '') +
         `*Reference:* ${c.agentReferenceName}\n` +
-        photoNote + `\n\n_Shared via NikahBureau Pro · Confidential_`;
+        photoNote + `\n\n_Shared via NikahPakka Pro · Confidential_`;
 
       const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
@@ -1224,7 +1224,7 @@
             await navigator.share({
               files: [file],
               title: `${candidateName} — Rishta Photo ${idx+1}`,
-              text: `Photo ${idx+1} of ${candidateName} — Shared via NikahBureau Pro`
+              text: `Photo ${idx+1} of ${candidateName} — Shared via NikahPakka Pro`
             });
             return;
           }
@@ -1239,7 +1239,7 @@
       const id = document.getElementById('shareCardContainer').dataset.cid;
       const c = candidates.find(x => x.id === id);
       if (!c) return;
-      const content = `NikahBureau Pro — Rishta Profile\n================================\n` +
+      const content = `NikahPakka Pro — Rishta Profile\n================================\n` +
         `Name: ${c.name}\nGender: ${c.gender}\n` +
         (c.dob ? `Date of Birth: ${c.dob}\n` : '') +
         `Age: ${c.age} years\nHeight: ${c.heightDisplay}\n` +
@@ -1255,7 +1255,7 @@
         (c.contactNumber ? `Contact: ${c.contactNumber}\n` : '') +
         `Reference Agent: ${c.agentReferenceName}\n` +
         (c.notes ? `Notes: ${c.notes}\n` : '') +
-        `\n--- NikahBureau Pro · Confidential ---`;
+        `\n--- NikahPakka Pro · Confidential ---`;
       const blob = new Blob([content], { type: 'text/plain' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -1396,7 +1396,7 @@
                   <div style="font-size:11px;color:#64748b;">Sect: ${p.sect} • Caste: ${p.caste}</div>
                   <div style="font-size:11px;color:#334155;margin-top:4px;">"${p.notes}"</div>
                   <div class="proposal-actions">
-                    <span style="font-size:10px;color:#94a3b8;">NikahBureau Pro</span>
+                    <span style="font-size:10px;color:#94a3b8;">NikahPakka Pro</span>
                     <button class="btn-advance" onclick="advanceStage('${p.id}')">Advance Stage ➔</button>
                   </div>
                 </div>`).join('')}

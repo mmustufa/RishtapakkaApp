@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'database/app_database.dart';
 import 'models/candidate.dart';
 import 'models/education_tier.dart';
@@ -11,7 +11,7 @@ void main() async {
   // Initialize SQLite database and seed initial test candidates if empty
   await _seedDemoCandidatesIfEmpty();
 
-  runApp(const NikahBureauApp());
+  runApp(const NikahPakkaApp());
 }
 
 Future<void> _seedDemoCandidatesIfEmpty() async {
@@ -108,13 +108,13 @@ Future<void> _seedDemoCandidatesIfEmpty() async {
   }
 }
 
-class NikahBureauApp extends StatelessWidget {
-  const NikahBureauApp({super.key});
+class NikahPakkaApp extends StatelessWidget {
+  const NikahPakkaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NikahBureau Pro',
+      title: 'NikahPakka Pro',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

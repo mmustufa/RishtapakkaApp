@@ -1,4 +1,4 @@
-name: Build Android APK for WhatsApp Sharing
+﻿name: Build Android APK for WhatsApp Sharing
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           DATE=$(date +'%Y%m%d')
           RELEASE_TAG="v${APP_VERSION}-build${BUILD_NUMBER}-${DATE}"
-          APK_NAME="NikahBureau-Pro-v${APP_VERSION}.apk"
+          APK_NAME="NikahPakka-Pro-v${APP_VERSION}.apk"
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
@@ -75,9 +75,9 @@ jobs:
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         with:
           tag_name: ${{ env.RELEASE_TAG }}
-          name: "NikahBureau Pro v${{ env.APP_VERSION }} — Android APK"
+          name: "NikahPakka Pro v${{ env.APP_VERSION }} — Android APK"
           body: |
-            ## 📱 NikahBureau Pro v${{ env.APP_VERSION }} — Rishta Agent App
+            ## 📱 NikahPakka Pro v${{ env.APP_VERSION }} — Rishta Agent App
 
             **Build:** #${{ env.BUILD_NUMBER }} · **Commit:** `${{ env.SHORT_SHA }}` · **Date:** ${{ github.event.head_commit.timestamp }}
 

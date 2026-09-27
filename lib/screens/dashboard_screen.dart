@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../database/app_database.dart';
 import '../models/candidate.dart';
 import '../models/pipeline_stage.dart';
@@ -66,7 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'NikahBureau Pro',
+              'NikahPakka Pro',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             Text(
