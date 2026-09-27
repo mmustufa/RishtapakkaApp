@@ -186,7 +186,7 @@ class BiodataOcrParser {
     // 1. Label-based: "Full Name:", "Name:", "Candidate Name:"
     final labelPatterns = [
       RegExp(r'(?:full\s*name|name)\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{2,40})', caseSensitive: false),
-      RegExp(r'(?:candidate|applicant|boy|girl|bride|groom)\s*(?:\'s\s*)?name\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{2,40})', caseSensitive: false),
+      RegExp("(?:candidate|applicant|boy|girl|bride|groom)\\s*(?:'s\\s*)?name\\s*[:\\-|]\\s*([A-Za-z][A-Za-z\\s\\.]{2,40})", caseSensitive: false),
     ];
     for (final pat in labelPatterns) {
       final m = pat.firstMatch(fullText);
@@ -294,13 +294,13 @@ class BiodataOcrParser {
       // "Height: 5 ft 5 inches" / "Height: 5 feet 1 inch"
       RegExp(r'(?:height|ht)\s*[:\-|]?\s*([4-7])\s*(?:ft|feet|foot)\s*([0-9]|1[0-1])\s*(?:inch(?:es)?|in\.?|")?', caseSensitive: false),
       // "Height: 5'11\"" or "Height: 5' 11\""
-      RegExp(r"(?:height|ht)\s*[:\-|]?\s*([4-7])\s*['′']\s*([0-9]|1[0-1])\s*[\"″]?", caseSensitive: false),
+      RegExp("(?:height|ht)\\s*[:\\-|]?\\s*([4-7])\\s*['\"'\\u2032]\\s*([0-9]|1[0-1])\\s*[\"'\\u2033]?", caseSensitive: false),
       // "Height: 5.8 ft" (decimal feet)
       RegExp(r'(?:height|ht)\s*[:\-|]?\s*([4-7])\.([0-9]|1[0-1])\s*(?:ft|feet|foot)', caseSensitive: false),
       // Without label: "5 ft 5 inches"
       RegExp(r'\b([4-7])\s*(?:ft|feet|foot)\s*([0-9]|1[0-1])\s*(?:inch(?:es)?|in\.?|")?', caseSensitive: false),
       // Without label: "5'11\"" or "5' 11"
-      RegExp(r"\b([4-7])\s*['′']\s*([0-9]|1[0-1])\s*[\"″]?"),
+      RegExp("\\b([4-7])\\s*['\"'\\u2032]\\s*([0-9]|1[0-1])\\s*[\"'\\u2033]?", caseSensitive: false),
       // cm: "155 cm" or "175cm"
       RegExp(r'\b(1[4-9]\d)\s*cm\b', caseSensitive: false),
     ];
