@@ -1,0 +1,35 @@
+name: rishta_agent_app
+description: "Offline Android App for Muslim Marriage Bureaus and Rishta Agents"
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Offline Local Database
+  sqflite: ^2.3.2
+  path: ^1.9.0
+  
+  # On-Device Machine Learning OCR (Google ML Kit)
+  google_mlkit_text_recognition: ^0.13.0
+  
+  # Local Image & Document Handling
+  image_picker: ^1.0.7
+  path_provider: ^2.1.2
+  
+  # Utilities & State Management
+  uuid: ^4.3.3
+  intl: ^0.19.0
+  flutter_animate: ^4.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
