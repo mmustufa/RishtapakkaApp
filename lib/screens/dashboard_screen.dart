@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../database/app_database.dart';
 import '../models/candidate.dart';
 import '../models/pipeline_stage.dart';
@@ -58,6 +59,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  Future<void> _shareOnWhatsApp(Candidate candidate) async {
+    final c = candidate;
+    final photos = c.allPhotos;
+    final photoNote = photos.isNotEmpty
+        ? '\n📸 ${photos.length} photo(s) available — ask agent to send separately.'
+        : '';
+    final text = '💍 *NikkahPakkah — Rishta Profile*\n\n'
+        '*Name:* ${c.name}\n'
+        '*Gender:* ${c.gender}\n'
+        '${c.dob.isNotEmpty ? "*Date of Birth:* ${c.dob}\n" : ""}'
+        '*Age:* ${c.age} years\n'
+        '*Height:* ${c.heightDisplay}\n'
+        '${c.complexion.isNotEmpty ? "*Complexion:* ${c.complexion}\n" : ""}'
+        '*Sect:* ${c.sect}\n'
+        '*Caste:* ${c.caste}\n'
+        '*Education:* ${c.education}\n'
+        '${c.occupation.isNotEmpty ? "*Occupation:* ${c.occupation}\n" : ""}'
+        '${c.fatherName.isNotEmpty ? "*Father:* ${c.fatherName}\n" : ""}'
+        '${c.city.isNotEmpty ? "*City:* ${c.city}\n" : ""}'
+        '${c.contactNumber.isNotEmpty ? "*Contact:* ${c.contactNumber}\n" : ""}'
+        '*Reference:* ${c.agentReferenceName}'
+        '$photoNote\n\n'
+        '_Shared via NikkahPakkah · Confidential_';
+
+    final url = Uri.parse('https://wa.me/?text=${Uri.encodeComponent(text)}');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('WhatsApp not installed on this device.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +101,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'NikahPakka Pro',
+              'NikkahPakkah',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             Text(
@@ -227,6 +262,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                 ).then((_) => _refreshData());
                               },
+                              onShare: () => _shareOnWhatsApp(candidate),
                               onFindMatches: () {
                                 Navigator.push(
                                   context,

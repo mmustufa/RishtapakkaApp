@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'database/app_database.dart';
 import 'models/candidate.dart';
 import 'models/education_tier.dart';
@@ -114,7 +114,7 @@ class NikahPakkaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NikahPakka Pro',
+      title: 'NikkahPakkah',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
