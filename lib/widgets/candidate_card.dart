@@ -112,7 +112,7 @@ class CandidateCard extends StatelessWidget {
                   _infoChip(
                     icon: Icons.mosque_rounded,
                     label: candidate.sect,
-                    bgColor: Colors.emeraldColor(),
+                    bgColor: const Color(0xFFD1FAE5),
                     textColor: const Color(0xFF065F46),
                   ),
                   _infoChip(

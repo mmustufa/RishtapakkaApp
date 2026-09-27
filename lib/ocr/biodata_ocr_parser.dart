@@ -309,7 +309,7 @@ class BiodataOcrParser {
   static _HeightResult _extractHeight(List<String> lines, String fullText) {
     // 1. Pattern: 5'8" or 5' 10" or 5ft 8in or 5 ft 7 in
     final ftInRegex = RegExp(
-      r'(?:height\s*[:\-\=]\s*)?([4-6])\s*(?:\'|ft|feet|\.)\s*([0-9]|1[0-1])(?:\s*(?:\"|in|inches))?',
+      r"""(?:height\s*[:\-\=]\s*)?([4-6])\s*(?:'|ft|feet|\.)\s*([0-9]|1[0-1])(?:\s*(?:"|in|inches))?""",
       caseSensitive: false,
     );
     final match = ftInRegex.firstMatch(fullText);

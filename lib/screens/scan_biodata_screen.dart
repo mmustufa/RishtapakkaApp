@@ -486,7 +486,7 @@ class _ScanBiodataScreenState extends State<ScanBiodataScreen> {
                             ],
                           ),
                         );
-                      }).toList>,
+                      }).toList(),
                       onChanged: (val) {
                         if (val != null) setState(() => _selectedStatus = val);
                       },
