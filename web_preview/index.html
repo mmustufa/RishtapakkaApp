@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NikahBureau Pro — Mobile Marriage Agent Local App</title>
+  <title>NikahBureau Pro — Muslim Marriage Agent App</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -32,687 +32,214 @@
       --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
       --shadow-lg: 0 12px 28px rgba(0,0,0,0.15);
     }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background: var(--bg-page); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+    /* Top Bar */
+    .preview-bar { width: 100%; max-width: 1100px; background: rgba(30,41,59,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-md); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; color: #fff; margin-bottom: 20px; box-shadow: var(--shadow-md); }
+    .preview-bar h1 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .badge-offline { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid #059669; font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+    .mode-toggle { display: flex; gap: 8px; }
+    .mode-btn { background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.15); padding: 6px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .mode-btn.active, .mode-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-    body {
-      background: var(--bg-page);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
+    /* App Viewport */
+    .app-viewport { width: 100%; max-width: 440px; min-height: 820px; background: #f8fafc; border-radius: 36px; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.6), 0 0 0 10px #1e293b; overflow: hidden; display: flex; flex-direction: column; position: relative; transition: max-width 0.3s ease; }
+    .app-viewport.desktop-mode { max-width: 1020px; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,0.15); }
+    .phone-notch { width: 120px; height: 18px; background: #1e293b; margin: 0 auto; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 50; }
+    .desktop-mode .phone-notch { display: none; }
 
-    /* Top Preview Control Bar */
-    .preview-bar {
-      width: 100%;
-      max-width: 1100px;
-      background: rgba(30, 41, 59, 0.85);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: var(--radius-md);
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: #fff;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow-md);
-    }
+    /* Header */
+    .mobile-header { background: linear-gradient(135deg, #065f46, #047857); color: white; padding: 30px 20px 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow-md); }
+    .desktop-mode .mobile-header { padding: 20px; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; }
+    .header-brand { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+    .header-subtitle { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; background: rgba(0,0,0,0.2); padding: 10px 8px; border-radius: var(--radius-md); text-align: center; }
+    .metric-item .val { font-size: 16px; font-weight: 800; color: #fff; }
+    .metric-item .lbl { font-size: 9px; color: rgba(255,255,255,0.75); text-transform: uppercase; font-weight: 600; }
 
-    .preview-bar h1 {
-      font-size: 16px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .badge-offline {
-      background: rgba(16, 185, 129, 0.2);
-      color: #34d399;
-      border: 1px solid #059669;
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .mode-toggle {
-      display: flex;
-      gap: 8px;
-    }
-
-    .mode-btn {
-      background: rgba(255,255,255,0.08);
-      color: #cbd5e1;
-      border: 1px solid rgba(255,255,255,0.15);
-      padding: 6px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .mode-btn.active, .mode-btn:hover {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-
-    /* App Container Layout (Mobile vs Desktop) */
-    .app-viewport {
-      width: 100%;
-      max-width: 440px;
-      min-height: 820px;
-      background: #f8fafc;
-      border-radius: 36px;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 10px #1e293b;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      transition: max-width 0.3s ease;
-    }
-
-    .app-viewport.desktop-mode {
-      max-width: 1020px;
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-
-    /* Phone Speaker Notch */
-    .phone-notch {
-      width: 120px;
-      height: 18px;
-      background: #1e293b;
-      margin: 0 auto;
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 50;
-    }
-
-    .desktop-mode .phone-notch {
-      display: none;
-    }
-
-    /* Mobile Header */
-    .mobile-header {
-      background: linear-gradient(135deg, #065f46, #047857);
-      color: white;
-      padding: 30px 20px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: var(--shadow-md);
-    }
-
-    .desktop-mode .mobile-header {
-      padding: 20px;
-    }
-
-    .header-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .header-brand {
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-    }
-
-    .header-subtitle {
-      font-size: 11px;
-      color: rgba(255,255,255,0.8);
-      font-weight: 500;
-    }
-
-    /* Metrics Summary Grid */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 10px 8px;
-      border-radius: var(--radius-md);
-      text-align: center;
-    }
-
-    .metric-item .val {
-      font-size: 16px;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    .metric-item .lbl {
-      font-size: 9px;
-      color: rgba(255,255,255,0.75);
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    /* Tab Navigation */
-    .nav-tabs {
-      display: flex;
-      background: #ffffff;
-      border-bottom: 1px solid var(--border-color);
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
+    /* Nav */
+    .nav-tabs { display: flex; background: #ffffff; border-bottom: 1px solid var(--border-color); overflow-x: auto; scrollbar-width: none; }
     .nav-tabs::-webkit-scrollbar { display: none; }
-
-    .nav-tab {
-      flex: 1;
-      min-width: 80px;
-      padding: 12px 6px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s;
-    }
-
+    .nav-tab { flex: 1; min-width: 70px; padding: 10px 4px; text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.2s; }
     .nav-tab svg { width: 18px; height: 18px; }
+    .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #f0fdf4; }
 
-    .nav-tab.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-      background: #f0fdf4;
-    }
+    /* Content */
+    .view-content { flex: 1; overflow-y: auto; padding: 14px; background: #f8fafc; display: none; }
+    .view-content.active { display: block; }
 
-    /* Main Content Area */
-    .view-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      background: #f8fafc;
-      display: none;
-    }
+    /* Search */
+    .search-box { position: relative; margin-bottom: 10px; }
+    .search-box input { width: 100%; padding: 10px 14px 10px 38px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 13px; background: #fff; outline: none; }
+    .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(4,120,87,0.15); }
+    .search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; fill: var(--text-muted); }
+    .filter-chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; scrollbar-width: none; }
+    .filter-chip { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: #fff; border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; white-space: nowrap; }
+    .filter-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-    .view-content.active {
-      display: block;
-    }
-
-    /* Search & Filter Bar */
-    .search-box {
-      position: relative;
-      margin-bottom: 12px;
-    }
-
-    .search-box input {
-      width: 100%;
-      padding: 10px 14px 10px 38px;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      font-size: 13px;
-      background: #fff;
-      outline: none;
-    }
-
-    .search-box input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.15);
-    }
-
-    .search-box svg {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
-      fill: var(--text-muted);
-    }
-
-    .filter-chips {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-    }
-
-    .filter-chip {
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      background: #fff;
-      border: 1px solid var(--border-color);
-      color: var(--text-muted);
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .filter-chip.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
-    }
-
-    /* Candidate Cards */
-    .candidate-card {
-      background: var(--bg-card);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow-sm);
-      position: relative;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .candidate-card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
-    }
-
-    .candidate-card.male {
-      border-left: 4px solid var(--secondary);
-    }
-
-    .candidate-card.female {
-      border-left: 4px solid var(--female-color);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-
+    /* Candidate Card */
+    .candidate-card { background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+    .candidate-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .candidate-card.male { border-left: 4px solid var(--secondary); }
+    .candidate-card.female { border-left: 4px solid var(--female-color); }
+    .card-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    .avatar { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; overflow: hidden; background: #e2e8f0; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
     .avatar.male { background: var(--secondary-light); }
     .avatar.female { background: var(--female-light); }
-
-    .header-details {
-      flex: 1;
-    }
-
-    .c-name {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .c-sub {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 500;
-      margin-top: 2px;
-    }
-
-    .badge-status {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-
-    .status-pending { background: #fef3c7; color: #b45309; }
-    .status-proposal { background: #dbeafe; color: #1d4ed8; }
-    .status-discussion { background: #ede9fe; color: #6d28d9; }
+    .header-details { flex: 1; min-width: 0; }
+    .c-name { font-size: 14px; font-weight: 700; color: var(--text-main); }
+    .c-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+    .c-dob { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+    .badge-status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0; }
+    .status-pending_review { background: #fef3c7; color: #b45309; }
+    .status-proposal_sent { background: #dbeafe; color: #1d4ed8; }
+    .status-family_discussion { background: #ede9fe; color: #6d28d9; }
     .status-shortlisted { background: #d1fae5; color: #047857; }
     .status-closed { background: #fee2e2; color: #b91c1c; }
-
-    .card-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-bottom: 12px;
-    }
-
-    .chip {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: #f1f5f9;
-      color: #334155;
-    }
-
+    .card-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .chip { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
     .chip-sect { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
     .chip-caste { background: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; }
     .chip-edu { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
-
-    .card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 10px;
-    }
-
-    .agent-ref {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .btn-match {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      padding: 6px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
+    .chip-occ { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 10px; gap: 6px; flex-wrap: wrap; }
+    .agent-ref { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+    .card-actions { display: flex; gap: 6px; }
+    .btn-match { background: var(--primary); color: #fff; border: none; padding: 6px 12px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; cursor: pointer; }
     .btn-match:hover { background: var(--primary-dark); }
+    .btn-view { background: #e2e8f0; color: #334155; border: none; padding: 6px 10px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; cursor: pointer; }
+    .btn-view:hover { background: #cbd5e1; }
+    .btn-share { background: #25D366; color: #fff; border: none; padding: 6px 10px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; cursor: pointer; }
 
-    /* OCR Scanner Section */
-    .scanner-panel {
-      background: #fff;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      padding: 16px;
-      margin-bottom: 16px;
-    }
+    /* Photo strip in card */
+    .photo-strip { display: flex; gap: 4px; margin-bottom: 8px; }
+    .photo-thumb { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border-color); }
 
-    .drop-zone {
-      border: 2px dashed #cbd5e1;
-      border-radius: var(--radius-md);
-      padding: 24px 16px;
-      text-align: center;
-      background: #f8fafc;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    /* Profile Modal */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; overflow-y: auto; padding: 20px; }
+    .modal-overlay.open { display: flex; justify-content: center; align-items: flex-start; }
+    .modal-box { background: #fff; border-radius: 20px; max-width: 480px; width: 100%; margin: auto; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.4); }
+    .modal-header { background: linear-gradient(135deg, #065f46, #047857); color: #fff; padding: 20px; position: relative; }
+    .modal-close { position: absolute; top: 12px; right: 14px; background: rgba(255,255,255,0.2); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-profile-top { display: flex; gap: 14px; align-items: flex-start; }
+    .modal-avatar { width: 72px; height: 72px; border-radius: 14px; overflow: hidden; flex-shrink: 0; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 32px; border: 3px solid rgba(255,255,255,0.4); }
+    .modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-name { font-size: 18px; font-weight: 800; }
+    .modal-meta { font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+    .modal-body { padding: 16px; }
+    .profile-section { margin-bottom: 16px; }
+    .profile-section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--primary); letter-spacing: 0.8px; margin-bottom: 10px; border-bottom: 2px solid var(--primary-light); padding-bottom: 4px; }
+    .profile-row { display: flex; gap: 6px; margin-bottom: 7px; font-size: 12px; }
+    .profile-label { font-weight: 700; color: #475569; width: 110px; flex-shrink: 0; }
+    .profile-value { color: var(--text-main); flex: 1; }
+    .photos-gallery { display: flex; gap: 8px; flex-wrap: wrap; }
+    .gallery-photo { width: 100px; height: 110px; border-radius: 10px; object-fit: cover; border: 2px solid var(--border-color); }
+    .modal-actions { padding: 14px 16px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-modal { flex: 1; min-width: 100px; padding: 10px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; border: none; cursor: pointer; }
+    .btn-modal.primary { background: var(--primary); color: #fff; }
+    .btn-modal.whatsapp { background: #25D366; color: #fff; }
+    .btn-modal.download { background: #1e40af; color: #fff; }
 
-    .drop-zone:hover {
-      border-color: var(--primary);
-      background: #f0fdf4;
-    }
-
-    .samples-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .sample-btn {
-      background: #e2e8f0;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
+    /* Scanner */
+    .scanner-panel { background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 14px; margin-bottom: 14px; }
+    .drop-zone { border: 2px dashed #cbd5e1; border-radius: var(--radius-md); padding: 20px 14px; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.2s; }
+    .drop-zone:hover { border-color: var(--primary); background: #f0fdf4; }
+    .scan-preview-area { margin-top: 10px; display: flex; gap: 8px; }
+    .scan-thumb { width: 80px; height: 90px; border-radius: 8px; object-fit: cover; border: 2px solid var(--border-color); }
+    .samples-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .sample-btn { background: #e2e8f0; border: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
     .sample-btn:hover { background: #cbd5e1; }
+    .ocr-status { font-size: 11px; font-weight: 600; padding: 8px 12px; border-radius: 8px; margin-top: 8px; display: none; }
+    .ocr-status.success { background: #d1fae5; color: #065f46; display: block; }
+    .ocr-status.info { background: #dbeafe; color: #1d4ed8; display: block; }
+    .ocr-status.warning { background: #fef3c7; color: #92400e; display: block; }
 
-    /* Form Styles */
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-top: 14px;
-    }
+    /* Photo upload for profile */
+    .photo-upload-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .photo-slot { width: 80px; height: 88px; border-radius: 10px; border: 2px dashed #cbd5e1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; font-size: 22px; color: #94a3b8; overflow: hidden; position: relative; background: #f8fafc; transition: border-color 0.2s; }
+    .photo-slot:hover { border-color: var(--primary); }
+    .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-slot .del-btn { position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.85); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: none; align-items: center; justify-content: center; }
+    .photo-slot:hover .del-btn { display: flex; }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .form-group.full-width {
-      grid-column: span 2;
-    }
-
-    .form-group label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #334155;
-    }
-
-    .form-group input, .form-group select, .form-group textarea {
-      padding: 8px 10px;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      outline: none;
-      background: #fff;
-    }
-
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(4, 120, 87, 0.15);
-    }
-
-    .btn-save-candidate {
-      grid-column: span 2;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      padding: 12px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-
+    /* Form */
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group.full-width { grid-column: span 2; }
+    .form-group label { font-size: 11px; font-weight: 700; color: #334155; }
+    .form-group input, .form-group select, .form-group textarea { padding: 8px 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 12px; outline: none; background: #fff; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(4,120,87,0.15); }
+    .btn-save-candidate { grid-column: span 2; background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 8px; }
     .btn-save-candidate:hover { background: var(--primary-dark); }
 
-    /* Matching View Styles */
-    .target-profile-bar {
-      background: #fff;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 12px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .rules-legend {
-      background: #f1f5f9;
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      font-size: 11px;
-      color: #334155;
-      margin-bottom: 14px;
-      line-height: 1.5;
-    }
-
-    .match-card {
-      background: #fff;
-      border-radius: var(--radius-md);
-      border: 1.5px solid #e2e8f0;
-      padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .match-card.pass {
-      border-color: #10b981;
-    }
-
-    .match-card.fail {
-      border-color: #ef4444;
-      opacity: 0.85;
-    }
-
-    .match-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .score-badge {
-      font-size: 16px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      line-height: 1.1;
-    }
-
+    /* Matching */
+    .target-profile-bar { background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+    .rules-legend { background: #f1f5f9; border-radius: var(--radius-sm); padding: 10px 12px; font-size: 11px; color: #334155; margin-bottom: 12px; line-height: 1.5; }
+    .match-card { background: #fff; border-radius: var(--radius-md); border: 1.5px solid #e2e8f0; padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+    .match-card.pass { border-color: #10b981; }
+    .match-card.fail { border-color: #ef4444; opacity: 0.85; }
+    .match-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .score-badge { font-size: 16px; font-weight: 800; padding: 4px 10px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
     .score-badge.pass { background: #d1fae5; color: #047857; }
     .score-badge.fail { background: #fee2e2; color: #b91c1c; }
-
     .score-badge span { font-size: 8px; font-weight: 700; text-transform: uppercase; }
-
-    .rule-check-grid {
-      background: #f8fafc;
-      border-radius: 8px;
-      padding: 8px 10px;
-      margin-bottom: 10px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      font-size: 11px;
-    }
-
-    .rule-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
+    .rule-check-grid { background: #f8fafc; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr; gap: 5px; font-size: 11px; }
+    .rule-item { display: flex; align-items: center; gap: 6px; }
     .rule-item.ok { color: #059669; font-weight: 600; }
     .rule-item.bad { color: #dc2626; font-weight: 600; }
 
-    /* Pipeline Board */
-    .pipeline-board {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    /* Pipeline */
+    .pipeline-board { display: flex; flex-direction: column; gap: 10px; }
+    .pipeline-stage-box { background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden; }
+    .stage-header { padding: 10px 14px; font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; color: #fff; }
+    .stage-items { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .proposal-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 12px; }
+    .proposal-pair { font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .proposal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 6px; border-top: 1px dashed #cbd5e1; }
+    .btn-advance { background: #047857; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; }
 
-    .pipeline-stage-box {
-      background: #fff;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      overflow: hidden;
-    }
-
-    .stage-header {
-      padding: 10px 14px;
-      font-size: 13px;
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: #fff;
-    }
-
-    .stage-items {
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .proposal-card {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 12px;
-    }
-
-    .proposal-pair {
-      font-weight: 700;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 4px;
-    }
-
-    .proposal-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-      padding-top: 6px;
-      border-top: 1px dashed #cbd5e1;
-    }
-
-    .btn-advance {
-      background: #047857;
-      color: #fff;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
-    }
+    /* Share card overlay */
+    #shareCardContainer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+    #shareCardContainer.open { display: flex; flex-direction: column; gap: 12px; }
+    #shareCard { background: #fff; border-radius: 16px; max-width: 360px; width: 100%; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .share-card-header { background: linear-gradient(135deg, #065f46, #047857); color: #fff; padding: 16px; display: flex; gap: 12px; align-items: center; }
+    .share-card-pic { width: 60px; height: 60px; border-radius: 12px; overflow: hidden; border: 2px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+    .share-card-pic img { width: 100%; height: 100%; object-fit: cover; }
+    .share-card-name { font-size: 16px; font-weight: 800; }
+    .share-card-meta { font-size: 11px; color: rgba(255,255,255,0.85); margin-top: 3px; }
+    .share-card-body { padding: 14px; }
+    .share-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 11px; }
+    .share-label { font-weight: 700; color: #475569; width: 90px; flex-shrink: 0; }
+    .share-val { color: #0f172a; }
+    .share-photos { display: flex; gap: 6px; padding: 10px 14px; border-top: 1px solid #f1f5f9; }
+    .share-photo { width: 70px; height: 78px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; }
+    .share-footer { background: #f8fafc; padding: 10px 14px; font-size: 10px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; }
+    .share-btn-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .share-btn-row button { padding: 10px 18px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
   </style>
 </head>
 <body>
 
-  <!-- Top Controller Bar -->
+  <!-- Top Bar -->
   <div class="preview-bar">
     <h1>
       <span>💍 NikahBureau Pro</span>
       <span class="badge-offline">⚡ 100% Offline App</span>
     </h1>
     <div class="mode-toggle">
-      <button class="mode-btn active" id="btnPhoneView" onclick="setMode('phone')">📱 Mobile View</button>
-      <button class="mode-btn" id="btnDesktopView" onclick="setMode('desktop')">💻 Tablet/Desktop</button>
+      <button class="mode-btn active" id="btnPhoneView" onclick="setMode('phone')">📱 Mobile</button>
+      <button class="mode-btn" id="btnDesktopView" onclick="setMode('desktop')">💻 Desktop</button>
     </div>
   </div>
 
-  <!-- Main Application Container -->
+  <!-- Main App Container -->
   <div class="app-viewport" id="appViewport">
     <div class="phone-notch"></div>
 
-    <!-- Mobile Header -->
+    <!-- Header -->
     <div class="mobile-header">
       <div class="header-top">
         <div>
@@ -721,40 +248,23 @@
         </div>
         <span class="badge-offline">Local SQLite</span>
       </div>
-
-      <!-- Live Bureau Statistics -->
       <div class="metrics-grid">
-        <div class="metric-item">
-          <div class="val" id="statTotal">4</div>
-          <div class="lbl">Profiles</div>
-        </div>
-        <div class="metric-item">
-          <div class="val" id="statGrooms">2</div>
-          <div class="lbl">Grooms</div>
-        </div>
-        <div class="metric-item">
-          <div class="val" id="statBrides">2</div>
-          <div class="lbl">Brides</div>
-        </div>
-        <div class="metric-item">
-          <div class="val" id="statProposals">1</div>
-          <div class="lbl">Active</div>
-        </div>
-        <div class="metric-item">
-          <div class="val" id="statAccepted">0</div>
-          <div class="lbl">Nikah</div>
-        </div>
+        <div class="metric-item"><div class="val" id="statTotal">4</div><div class="lbl">Profiles</div></div>
+        <div class="metric-item"><div class="val" id="statGrooms">2</div><div class="lbl">Grooms</div></div>
+        <div class="metric-item"><div class="val" id="statBrides">2</div><div class="lbl">Brides</div></div>
+        <div class="metric-item"><div class="val" id="statProposals">1</div><div class="lbl">Active</div></div>
+        <div class="metric-item"><div class="val" id="statAccepted">0</div><div class="lbl">Nikah</div></div>
       </div>
     </div>
 
-    <!-- Navigation Tabs -->
+    <!-- Nav Tabs -->
     <div class="nav-tabs">
       <div class="nav-tab active" onclick="switchTab('profiles')">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         <span>Profiles</span>
       </div>
       <div class="nav-tab" onclick="switchTab('scanner')">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 6.5v3h-3v-3h3M11 5H5v6h6V5zm-1.5 9.5v3h-3v-3h3M11 13H5v6h6v-6zm6.5-6.5v3h-3v-3h3M20 5h-6v6h6V5zm-6 8h1.5v1.5H14V13zm1.5 1.5H17V16h-1.5v-1.5zM17 13h1.5v1.5H17V13zm-3 3h1.5v1.5H14V16zm1.5 1.5H17V19h-1.5v-1.5zM17 16h1.5v1.5H17V16zm1.5-1.5H20V16h-1.5v-1.5zm0 3H20V19h-1.5v-1.5z"/></svg>
         <span>Scan OCR</span>
       </div>
       <div class="nav-tab" onclick="switchTab('matchmaker')">
@@ -767,64 +277,88 @@
       </div>
     </div>
 
-    <!-- TAB 1: Profiles Directory -->
+    <!-- TAB 1: Profiles -->
     <div class="view-content active" id="view-profiles">
       <div class="search-box">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" id="searchInput" placeholder="Search name, sect, caste, agent..." oninput="renderProfiles()">
+        <input type="text" id="searchInput" placeholder="Search name, sect, caste, city..." oninput="renderProfiles()">
       </div>
-
       <div class="filter-chips">
         <div class="filter-chip active" onclick="setFilter('all', this)">All</div>
-        <div class="filter-chip" onclick="setFilter('Male', this)">Grooms (Male)</div>
-        <div class="filter-chip" onclick="setFilter('Female', this)">Brides (Female)</div>
+        <div class="filter-chip" onclick="setFilter('Male', this)">Grooms</div>
+        <div class="filter-chip" onclick="setFilter('Female', this)">Brides</div>
         <div class="filter-chip" onclick="setFilter('Barelvi', this)">Barelvi</div>
         <div class="filter-chip" onclick="setFilter('Deobandi', this)">Deobandi</div>
         <div class="filter-chip" onclick="setFilter('Sheikh', this)">Sheikh</div>
         <div class="filter-chip" onclick="setFilter('Syed', this)">Syed</div>
       </div>
-
       <div id="candidatesList"></div>
     </div>
 
-    <!-- TAB 2: AI / OCR Biodata Scanner -->
+    <!-- TAB 2: OCR Scanner -->
     <div class="view-content" id="view-scanner">
+
+      <!-- STEP 1: Upload Biodata & Photo -->
       <div class="scanner-panel">
-        <h3 style="font-size: 14px; margin-bottom: 8px;">📷 Bio-Data Sheet OCR Scanner</h3>
-        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
-          Upload a paper biodata photo or screenshot. On-device heuristics will auto-populate the form below.
+        <h3 style="font-size:14px;margin-bottom:8px;">📷 Step 1: Upload Biodata Sheet</h3>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">
+          Upload a photo/scan of the bio-data paper. The smart parser will auto-fill all fields below.
         </p>
-
-        <div class="drop-zone" onclick="document.getElementById('fileUpload').click()">
-          <input type="file" id="fileUpload" style="display:none;" accept="image/*" onchange="handleImageUpload(event)">
-          <div style="font-size: 28px;">📄</div>
-          <div style="font-size: 12px; font-weight: 700; margin-top: 4px;">Click to Select Bio-Data Image</div>
-          <div style="font-size: 10px; color: var(--text-muted);">or click a sample biodata below to test immediately:</div>
+        <div class="drop-zone" onclick="document.getElementById('fileUploadBiodata').click()">
+          <input type="file" id="fileUploadBiodata" style="display:none;" accept="image/*" onchange="handleBiodataUpload(event)">
+          <div style="font-size:26px;">📄</div>
+          <div style="font-size:12px;font-weight:700;margin-top:4px;">Click to Select Bio-Data Image</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Supports: JPG, PNG, scanned PDFs as image</div>
         </div>
-
-        <div style="margin-top: 10px;">
-          <div style="font-size: 11px; font-weight: 700;">Quick Test Pre-scanned Samples:</div>
+        <div id="biodataScanPreview" style="margin-top:8px;display:none;">
+          <img id="biodataPreviewImg" style="width:100%;max-height:160px;object-fit:contain;border-radius:8px;border:1px solid #e2e8f0;">
+        </div>
+        <div id="ocrStatus" class="ocr-status"></div>
+        <div style="margin-top:12px;">
+          <div style="font-size:11px;font-weight:700;margin-bottom:8px;">🔬 Quick Test Pre-scanned Samples:</div>
           <div class="samples-row">
-            <button class="sample-btn" onclick="loadSample(1)">Sample 1: Tariq Sheikh (Barelvi MS)</button>
-            <button class="sample-btn" onclick="loadSample(2)">Sample 2: Fatima Sheikh (Barelvi BS)</button>
-            <button class="sample-btn" onclick="loadSample(3)">Sample 3: Imran Rajput (Deobandi PhD)</button>
+            <button class="sample-btn" onclick="loadSample(1)">👨 Sample: Suhel Melmuri</button>
+            <button class="sample-btn" onclick="loadSample(2)">👨 Sample: Rameez Hosuri</button>
+            <button class="sample-btn" onclick="loadSample(3)">🧕 Sample: Isharat Mujawar</button>
           </div>
         </div>
       </div>
 
-      <!-- Scanned & Manual Override Form -->
-      <div style="background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 14px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <span style="font-size: 13px; font-weight: 700;">✍️ Verified Fields & Manual Override</span>
-          <span style="font-size: 10px; color: var(--primary); font-weight: 600;">Editable before save</span>
+      <!-- STEP 2: Candidate Photos -->
+      <div class="scanner-panel">
+        <h3 style="font-size:13px;margin-bottom:6px;">📸 Step 2: Upload Candidate Photos (1–3)</h3>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">First photo is shown as profile picture. Up to 3 photos can be shared on WhatsApp.</p>
+        <div class="photo-upload-grid" id="photoUploadGrid">
+          <div class="photo-slot" id="photoSlot0" onclick="triggerPhotoUpload(0)">
+            <span>👤</span>
+            <span style="font-size:9px;margin-top:2px;color:#94a3b8;">Photo 1</span>
+          </div>
+          <div class="photo-slot" id="photoSlot1" onclick="triggerPhotoUpload(1)">
+            <span>+</span>
+            <span style="font-size:9px;margin-top:2px;color:#94a3b8;">Photo 2</span>
+          </div>
+          <div class="photo-slot" id="photoSlot2" onclick="triggerPhotoUpload(2)">
+            <span>+</span>
+            <span style="font-size:9px;margin-top:2px;color:#94a3b8;">Photo 3</span>
+          </div>
+        </div>
+        <input type="file" id="photoInput0" style="display:none;" accept="image/*" onchange="handlePhotoUpload(0, event)">
+        <input type="file" id="photoInput1" style="display:none;" accept="image/*" onchange="handlePhotoUpload(1, event)">
+        <input type="file" id="photoInput2" style="display:none;" accept="image/*" onchange="handlePhotoUpload(2, event)">
+      </div>
+
+      <!-- STEP 3: Verified Fields Form -->
+      <div style="background:#fff;border-radius:var(--radius-md);border:1px solid var(--border-color);padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:13px;font-weight:700;">✍️ Step 3: Verify & Save Profile</span>
+          <span style="font-size:10px;color:var(--primary);font-weight:600;">Edit before saving</span>
         </div>
 
         <div class="form-grid">
           <div class="form-group full-width">
-            <label>Full Candidate Name *</label>
-            <input type="text" id="formName" placeholder="e.g. Tariq Sheikh">
+            <label>Full Name *</label>
+            <input type="text" id="formName" placeholder="e.g. Suhel Jafar Melmuri">
           </div>
-
           <div class="form-group">
             <label>Gender *</label>
             <select id="formGender">
@@ -832,199 +366,213 @@
               <option value="Female">Female (Bride)</option>
             </select>
           </div>
-
           <div class="form-group">
-            <label>Age (years) *</label>
-            <input type="number" id="formAge" value="28">
+            <label>Date of Birth</label>
+            <input type="text" id="formDob" placeholder="e.g. 06 March 1997">
           </div>
-
           <div class="form-group">
-            <label>Height (e.g. 5'11" or 5.9) *</label>
-            <input type="text" id="formHeight" value="5' 11\"" placeholder="5' 10&quot;">
+            <label>Age (years)</label>
+            <input type="number" id="formAge" value="26">
           </div>
-
           <div class="form-group">
-            <label>Weight (kg)</label>
-            <input type="number" id="formWeight" value="74">
+            <label>Height *</label>
+            <input type="text" id="formHeight" value="" placeholder='e.g. 5&apos;8" or 5.8 ft or 5 ft 8 in'>
           </div>
-
+          <div class="form-group">
+            <label>Complexion</label>
+            <input type="text" id="formComplexion" placeholder="e.g. Fair, Wheatish, Dusky">
+          </div>
           <div class="form-group">
             <label>Sect (Maslak) *</label>
             <select id="formSect">
+              <option value="Sunni">Sunni / General</option>
               <option value="Barelvi">Barelvi</option>
               <option value="Deobandi">Deobandi</option>
               <option value="Ahle Hadith">Ahle Hadith</option>
               <option value="Tablighi">Tablighi</option>
-              <option value="Sunni">Sunni / General</option>
               <option value="Shia">Shia</option>
             </select>
           </div>
-
           <div class="form-group">
             <label>Caste (Biradari) *</label>
-            <input type="text" id="formCaste" value="Sheikh" placeholder="e.g. Sheikh, Syed, Rajput">
+            <input type="text" id="formCaste" placeholder="e.g. Sheikh, Syed, Rajput, Melmuri">
           </div>
-
           <div class="form-group full-width">
-            <label>Education Degree *</label>
-            <input type="text" id="formEdu" value="MS Computer Science" placeholder="e.g. MS, MBBS, BS">
+            <label>Qualification / Education *</label>
+            <input type="text" id="formEdu" placeholder="e.g. Diploma in Civil Engineering, B.Com, BE in CSE">
           </div>
-
           <div class="form-group full-width">
-            <label>Education Hierarchy Tier *</label>
+            <label>Education Tier *</label>
             <select id="formEduTier">
-              <option value="6">Tier 6: Doctorate / PhD / Post-Doc</option>
-              <option value="5" selected>Tier 5: Masters / MS / MBA / MBBS / MD / CA</option>
-              <option value="4">Tier 4: Bachelors / BS / B.Tech / B.Com / LLB</option>
-              <option value="3">Tier 3: Associate Degree / 3-Year Diploma</option>
-              <option value="2">Tier 2: Intermediate / FSc / ICS / 12th / A-Levels</option>
-              <option value="1">Tier 1: Matriculation / 10th / O-Levels</option>
+              <option value="6">Tier 6: Doctorate / PhD</option>
+              <option value="5">Tier 5: Masters / MS / MBA / MBBS / CA</option>
+              <option value="4" selected>Tier 4: Bachelors / BE / B.Com / LLB</option>
+              <option value="3">Tier 3: Diploma / 3-Year Certificate</option>
+              <option value="2">Tier 2: Intermediate / HSC / 12th</option>
+              <option value="1">Tier 1: Matriculation / 10th</option>
             </select>
           </div>
-
+          <div class="form-group full-width">
+            <label>Occupation / Profession</label>
+            <input type="text" id="formOccupation" placeholder="e.g. Businessman, Engineer at TCS, Revenue Assistant">
+          </div>
           <div class="form-group">
             <label>City *</label>
-            <input type="text" id="formCity" value="Lahore">
+            <input type="text" id="formCity" placeholder="e.g. Hubli, Gokak, Hubli-Dharwad">
           </div>
-
           <div class="form-group">
             <label>Phone / WhatsApp</label>
-            <input type="text" id="formPhone" value="+92 300 1234567">
+            <input type="text" id="formPhone" placeholder="+91 94486 36922">
           </div>
-
+          <div class="form-group full-width">
+            <label>Father's Name</label>
+            <input type="text" id="formFatherName" placeholder="e.g. Mohammed Jafar Melmuri">
+          </div>
+          <div class="form-group full-width">
+            <label>Father's Occupation</label>
+            <input type="text" id="formFatherOcc" placeholder="e.g. Businessman, Lecturer">
+          </div>
+          <div class="form-group full-width">
+            <label>Mother's Name</label>
+            <input type="text" id="formMotherName" placeholder="e.g. Parveen Jafar Melmuri">
+          </div>
+          <div class="form-group full-width">
+            <label>Residential Address</label>
+            <textarea id="formAddress" rows="2" placeholder="e.g. Gudihal Road, Near Nihal Hall, Hubli - 580028"></textarea>
+          </div>
           <div class="form-group full-width">
             <label>Agent / Reference Name * (Mandatory)</label>
-            <input type="text" id="formAgent" value="Haji Aslam Bureau" placeholder="Submitting Bureau / Agent Name">
+            <input type="text" id="formAgent" placeholder="Submitting Bureau / Agent Name">
+          </div>
+          <div class="form-group full-width">
+            <label>Additional Notes</label>
+            <textarea id="formNotes" rows="2" placeholder="Any extra information..."></textarea>
           </div>
 
-          <button class="btn-save-candidate" onclick="saveCandidateFromForm()">💾 Save to Local SQLite & Run Matchmaker</button>
+          <button class="btn-save-candidate" onclick="saveCandidateFromForm()">💾 Save Profile & Run Matchmaker</button>
         </div>
       </div>
     </div>
 
-    <!-- TAB 3: Strict Matchmaker -->
+    <!-- TAB 3: Matchmaker -->
     <div class="view-content" id="view-matchmaker">
       <div class="target-profile-bar">
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">FINDING MATCHES FOR:</div>
-        <select id="targetCandidateSelect" onchange="runMatchmaker()" style="flex:1; padding: 6px; border-radius: 6px; font-weight: 700;">
-        </select>
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);">FINDING MATCHES FOR:</div>
+        <select id="targetCandidateSelect" onchange="runMatchmaker()" style="flex:1;padding:6px;border-radius:6px;font-weight:700;border:1px solid #e2e8f0;"></select>
       </div>
-
       <div class="rules-legend">
-        <strong>Strict 4 Matrimonial Rules Enforced:</strong><br>
+        <strong>Strict Matrimonial Rules Enforced:</strong><br>
         1. <strong>Gender Complementarity</strong> (Male ↔ Female)<br>
-        2. <strong>Exact Sect (Maslak)</strong> (e.g. Barelvi with Barelvi)<br>
-        3. <strong>Exact Caste (Biradari)</strong> (e.g. Sheikh with Sheikh)<br>
-        4. <strong>Height Constraint:</strong> Male height strictly &gt; Female height<br>
-        5. <strong>Educational Hierarchy:</strong> Male tier &gt;= Female tier
+        2. <strong>Exact Sect (Maslak)</strong> must match<br>
+        3. <strong>Exact Caste (Biradari)</strong> must match<br>
+        4. <strong>Height:</strong> Groom strictly taller than Bride<br>
+        5. <strong>Education:</strong> Groom tier ≥ Bride tier
       </div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <span style="font-size: 12px; font-weight: 700;" id="matchResultsCount">0 Potential Matches</span>
-        <label style="font-size: 11px; display: flex; align-items: center; gap: 4px;">
-          <input type="checkbox" id="chkStrictOnly" checked onchange="runMatchmaker()">
-          Strict Only
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:12px;font-weight:700;" id="matchResultsCount">0 Candidates</span>
+        <label style="font-size:11px;display:flex;align-items:center;gap:4px;">
+          <input type="checkbox" id="chkStrictOnly" checked onchange="runMatchmaker()"> Strict Only
         </label>
       </div>
-
       <div id="matchingCardsContainer"></div>
     </div>
 
-    <!-- TAB 4: Pipeline Tracker -->
+    <!-- TAB 4: Pipeline -->
     <div class="view-content" id="view-pipeline">
-      <div style="font-size: 13px; font-weight: 700; margin-bottom: 12px;">📊 Match Pipeline & Family Discussion Tracker</div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;">📊 Match Pipeline & Family Discussion Tracker</div>
       <div class="pipeline-board" id="pipelineBoard"></div>
     </div>
+  </div>
 
+  <!-- Profile Modal -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-box" id="profileModalBox">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeProfileModal()">✕</button>
+        <div class="modal-profile-top">
+          <div class="modal-avatar" id="modalAvatar"></div>
+          <div>
+            <div class="modal-name" id="modalName">-</div>
+            <div class="modal-meta" id="modalMeta">-</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+
+  <!-- Share Card -->
+  <div id="shareCardContainer">
+    <div id="shareCard">
+      <div class="share-card-header">
+        <div class="share-card-pic" id="shareCardPic"></div>
+        <div>
+          <div class="share-card-name" id="shareCardName"></div>
+          <div class="share-card-meta" id="shareCardMeta"></div>
+        </div>
+      </div>
+      <div class="share-card-body" id="shareCardBody"></div>
+      <div class="share-photos" id="shareCardPhotos" style="display:none;"></div>
+      <div class="share-footer">NikahBureau Pro · Confidential Rishta Profile</div>
+    </div>
+    <div class="share-btn-row">
+      <button style="background:#25D366;color:#fff;" onclick="sendToWhatsApp()">💬 Share on WhatsApp</button>
+      <button style="background:#1e40af;color:#fff;" onclick="downloadShareCard()">⬇️ Download Card</button>
+      <button style="background:#334155;color:#fff;" onclick="closeShareCard()">✕ Close</button>
+    </div>
   </div>
 
   <script>
-    // In-memory Database simulating local SQLite storage
+    // ===================== DATA STORE =====================
     let candidates = [
       {
-        id: "c-1",
-        name: "Tariq Sheikh",
-        gender: "Male",
-        age: 28,
-        heightInches: 71.0,
-        heightDisplay: "5' 11\"",
-        weightKg: 74,
-        education: "MS Computer Science",
-        educationTier: 5,
-        sect: "Barelvi",
-        caste: "Sheikh",
-        city: "Lahore",
-        contactNumber: "+92 300 1234567",
-        agentReferenceName: "Haji Aslam Bureau",
-        pipelineStatus: "pending_review",
-        notes: "Own house in DHA Lahore. Software Architect."
+        id: "c-1", name: "Tariq Sheikh", gender: "Male", dob: "15 May 1996", age: 28,
+        heightInches: 71, heightDisplay: "5' 11\"", complexion: "Fair",
+        education: "MS Computer Science", educationTier: 5, occupation: "Software Architect",
+        sect: "Barelvi", caste: "Sheikh", city: "Lahore", contactNumber: "+92 300 1234567",
+        agentReferenceName: "Haji Aslam Bureau", pipelineStatus: "pending_review",
+        fatherName: "Haji Aslam Sheikh", fatherOcc: "Businessman", motherName: "Zainab Sheikh",
+        address: "DHA Phase 5, Lahore", notes: "Own house in DHA Lahore. Practicing Muslim.",
+        photos: []
       },
       {
-        id: "c-2",
-        name: "Fatima Sheikh",
-        gender: "Female",
-        age: 25,
-        heightInches: 65.0,
-        heightDisplay: "5' 5\"",
-        weightKg: 58,
-        education: "BSc Psychology",
-        educationTier: 4,
-        sect: "Barelvi",
-        caste: "Sheikh",
-        city: "Lahore",
-        contactNumber: "+92 321 9876543",
-        agentReferenceName: "Direct Family Reference",
-        pipelineStatus: "pending_review",
-        notes: "Religious, cultured family."
+        id: "c-2", name: "Fatima Sheikh", gender: "Female", dob: "20 Feb 1999", age: 25,
+        heightInches: 65, heightDisplay: "5' 5\"", complexion: "Fair",
+        education: "BSc Psychology", educationTier: 4, occupation: "Teacher",
+        sect: "Barelvi", caste: "Sheikh", city: "Lahore", contactNumber: "+92 321 9876543",
+        agentReferenceName: "Direct Family Reference", pipelineStatus: "pending_review",
+        fatherName: "Abdul Qadir Sheikh", fatherOcc: "Retired Govt Officer", motherName: "Noor Sheikh",
+        address: "Gulberg III, Lahore", notes: "Religious, cultured family.",
+        photos: []
       },
       {
-        id: "c-3",
-        name: "Ayesha Syed",
-        gender: "Female",
-        age: 24,
-        heightInches: 64.0,
-        heightDisplay: "5' 4\"",
-        weightKg: 54,
-        education: "M.Com Finance",
-        educationTier: 5,
-        sect: "Deobandi",
-        caste: "Syed",
-        city: "Karachi",
-        contactNumber: "+92 333 4567890",
-        agentReferenceName: "Al-Madina Rishta Centre",
-        pipelineStatus: "pending_review",
-        notes: "Strict Syed family seeking practicing Deobandi gentleman."
+        id: "c-3", name: "Ayesha Syed", gender: "Female", dob: "12 Jan 2000", age: 24,
+        heightInches: 64, heightDisplay: "5' 4\"", complexion: "Fair",
+        education: "M.Com Finance", educationTier: 5, occupation: "Bank Officer",
+        sect: "Deobandi", caste: "Syed", city: "Karachi", contactNumber: "+92 333 4567890",
+        agentReferenceName: "Al-Madina Rishta Centre", pipelineStatus: "pending_review",
+        fatherName: "Syed Akbar Ali", fatherOcc: "Doctor", motherName: "Syed Rukhsana",
+        address: "Gulshan-e-Iqbal, Karachi", notes: "Strict Syed family seeking practicing Deobandi gentleman.",
+        photos: []
       },
       {
-        id: "c-4",
-        name: "Bilal Ansari",
-        gender: "Male",
-        age: 29,
-        heightInches: 66.0,
-        heightDisplay: "5' 6\"",
-        weightKg: 68,
-        education: "F.Sc Pre-Engineering",
-        educationTier: 2,
-        sect: "Tablighi",
-        caste: "Ansari",
-        city: "Rawalpindi",
-        contactNumber: "+92 345 1122334",
-        agentReferenceName: "Maulana Farooq Bureau",
-        pipelineStatus: "pending_review",
-        notes: "Textile wholesale business owner."
+        id: "c-4", name: "Bilal Ansari", gender: "Male", dob: "03 Aug 1995", age: 29,
+        heightInches: 66, heightDisplay: "5' 6\"", complexion: "Wheatish",
+        education: "F.Sc Pre-Engineering", educationTier: 2, occupation: "Textile Businessman",
+        sect: "Tablighi", caste: "Ansari", city: "Rawalpindi", contactNumber: "+92 345 1122334",
+        agentReferenceName: "Maulana Farooq Bureau", pipelineStatus: "pending_review",
+        fatherName: "Haji Ansari", fatherOcc: "Wholesaler", motherName: "Nafeesa Ansari",
+        address: "Satellite Town, Rawalpindi", notes: "Textile wholesale business owner.",
+        photos: []
       }
     ];
 
     let proposals = [
       {
-        id: "prop-1",
-        maleId: "c-1",
-        femaleId: "c-2",
-        maleName: "Tariq Sheikh",
-        femaleName: "Fatima Sheikh",
-        sect: "Barelvi",
-        caste: "Sheikh",
-        stage: "proposal_sent",
+        id: "prop-1", maleId: "c-1", femaleId: "c-2",
+        maleName: "Tariq Sheikh", femaleName: "Fatima Sheikh",
+        sect: "Barelvi", caste: "Sheikh", stage: "proposal_sent",
         notes: "Initial biodata sheets exchanged via WhatsApp."
       }
     ];
@@ -1038,392 +586,302 @@
     ];
 
     let currentFilter = 'all';
+    let currentPhotos = ['', '', ''];
+    let currentBiodataImg = '';
 
-    function setMode(mode) {
-      const vp = document.getElementById('appViewport');
-      document.getElementById('btnPhoneView').classList.toggle('active', mode === 'phone');
-      document.getElementById('btnDesktopView').classList.toggle('active', mode === 'desktop');
-      if (mode === 'desktop') {
-        vp.classList.add('desktop-mode');
-      } else {
-        vp.classList.remove('desktop-mode');
+    // ===================== SMART OCR PARSER =====================
+    function smartOCRParse(text) {
+      const result = {};
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const fullText = text;
+
+      // ---- NAME ----
+      // Look for label-based extraction first: "Full Name:", "Name:", "Applicant Name:"
+      const namePatterns = [
+        /(?:full\s*name|name)\s*[:\-\|]\s*([A-Za-z][A-Za-z\s]{2,40})/i,
+        /(?:candidate|applicant)\s*(?:name|'s\s*name)\s*[:\-\|]\s*([A-Za-z][A-Za-z\s]{2,40})/i
+      ];
+      for (const pat of namePatterns) {
+        const m = fullText.match(pat);
+        if (m) {
+          let name = m[1].trim();
+          // Stop at first line break, number, or common stop words
+          name = name.split(/\n|\d|(?:\b(?:date|age|height|s\/o|d\/o|gender|dob|marital|born)\b)/i)[0].trim();
+          name = name.replace(/[^\w\s]/g, '').trim();
+          if (name.split(' ').length >= 2 && name.length > 4) {
+            result.name = toTitleCase(name.replace(/\s+/g, ' '));
+            break;
+          }
+        }
       }
+      // Fallback: look for prominent standalone name-like lines near the top
+      if (!result.name) {
+        for (let i = 0; i < Math.min(lines.length, 15); i++) {
+          const line = lines[i].trim();
+          // Skip lines that are section headings or contain numbers/special chars
+          if (/marriage|bio.?data|personal|details|qualification|bismillah|Allah|Raheem|rishta|proposal|family|background/i.test(line)) continue;
+          if (/[0-9:\-\/|@#$%\[\]()]/.test(line)) continue;
+          const words = line.split(/\s+/);
+          if (words.length >= 2 && words.length <= 5 && words.every(w => /^[A-Z][a-zA-Z]+$/.test(w))) {
+            result.name = toTitleCase(line);
+            break;
+          }
+        }
+      }
+
+      // ---- DATE OF BIRTH ----
+      const dobPatterns = [
+        /(?:date\s*of\s*birth|dob|d\.o\.b|born)\s*[:\-\|]\s*([\d]{1,2}[\s\/\-\.]?(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?|\d{1,2})[\s\/\-\.]?\d{2,4})/i,
+        /(?:date\s*of\s*birth|dob)\s*[:\-\|]\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,
+        /(?:date\s*of\s*birth|dob)\s*[:\-\|]\s*(\d{1,2}\s+\w+\s+\d{4})/i
+      ];
+      for (const pat of dobPatterns) {
+        const m = fullText.match(pat);
+        if (m) { result.dob = m[1].trim(); break; }
+      }
+
+      // ---- AGE ----
+      const agePatterns = [
+        /\bage\s*[:\-\|]\s*(\d{2})\s*(?:years?|yrs?)?/i,
+        /(\d{2})\s*(?:years?\s*old|yrs?\s*old)/i
+      ];
+      for (const pat of agePatterns) {
+        const m = fullText.match(pat);
+        if (m) { result.age = parseInt(m[1]); break; }
+      }
+
+      // ---- HEIGHT ----
+      // Handles: 5.8 ft, 5'8", 5'11", 5 ft 5 inches, 5 feet 1 inch, "5 ft 11 inches", "5,11", 175 cm
+      const heightPatterns = [
+        // 5 ft 11 inches / 5 feet 5 inches / 5 ft 5 in
+        /(?:height|ht)\s*[:\-\|]?\s*([4-7])\s*(?:ft|feet|foot)\s*([0-9]|1[0-1])\s*(?:inch(?:es)?|in\.?|\")?/i,
+        // 5'11" or 5' 11" or 5'11
+        /(?:height|ht)\s*[:\-\|]?\s*([4-7])\s*['\u2019\u02BC]\s*([0-9]|1[0-1])\s*["\u201D]?/i,
+        // 5.8 ft or 5.11 ft (decimal)
+        /(?:height|ht)\s*[:\-\|]?\s*([4-7])\.([0-9]|1[0-1])\s*(?:ft|feet|foot)/i,
+        // Without label: 5 ft 5 inches or 5'5"
+        /\b([4-7])\s*(?:ft|feet|foot)\s*([0-9]|1[0-1])\s*(?:inch(?:es)?|in\.?|\")?/i,
+        /\b([4-7])\s*['\u2019]\s*([0-9]|1[0-1])\s*["\u201D]?/i,
+        // cm: 155 cm or 175cm
+        /\b(1[4-9]\d)\s*cm\b/i
+      ];
+      for (const pat of heightPatterns) {
+        const m = fullText.match(pat);
+        if (m) {
+          if (pat.source.includes('cm') || /^\d{3}$/.test(m[1])) {
+            const cm = parseFloat(m[1]);
+            const totalIn = cm / 2.54;
+            const ft = Math.floor(totalIn / 12);
+            const inch = Math.round(totalIn % 12);
+            result.heightDisplay = `${ft}' ${inch}"`;
+            result.heightInches = totalIn;
+          } else {
+            const ft = parseInt(m[1]);
+            const inch = parseInt(m[2]) || 0;
+            result.heightDisplay = `${ft}' ${inch}"`;
+            result.heightInches = (ft * 12) + inch;
+          }
+          break;
+        }
+      }
+
+      // ---- GENDER ----
+      if (/\b(?:female|bride|girl|sister|daughter|woman)\b/i.test(fullText)) result.gender = 'Female';
+      else if (/\b(?:male|groom|boy|son|brother|man)\b/i.test(fullText)) result.gender = 'Male';
+
+      // ---- EDUCATION ----
+      const eduPatterns = [
+        /(?:qualification|education|highest\s*education|degree)\s*[:\-\|]\s*(.+?)(?=\n|occupation|profession|job)/i,
+        /(?:qualification|education)\s*[:\-\|]\s*(.{4,60})/i
+      ];
+      for (const pat of eduPatterns) {
+        const m = fullText.match(pat);
+        if (m) {
+          result.education = m[1].trim().replace(/\s+/g, ' ');
+          result.educationTier = inferEducationTier(result.education);
+          break;
+        }
+      }
+
+      // ---- OCCUPATION ----
+      const occPatterns = [
+        /(?:occupation|profession|job|work(?:ing\s*as)?)\s*[:\-\|]\s*(.+?)(?=\n|father|mother|city|address|contact)/i,
+        /(?:occupation|profession)\s*[:\-\|]\s*(.{4,80})/i
+      ];
+      for (const pat of occPatterns) {
+        const m = fullText.match(pat);
+        if (m) { result.occupation = m[1].trim().replace(/\s+/g, ' ').substring(0, 80); break; }
+      }
+
+      // ---- CITY ----
+      const cityPatterns = [
+        /(?:city|place\s*of\s*birth|location|address)[^:]*[:\-\|]\s*([A-Za-z\s\-]{3,30})/i,
+        /(?:Hubli|Dharwad|Bangalore|Mumbai|Hyderabad|Gokak|Belagavi|Ramdurg|Malegaon|Karachi|Lahore|Islamabad|Rawalpindi|Peshawar|Quetta|Delhi|Chennai|Pune)/i
+      ];
+      for (const pat of cityPatterns) {
+        const m = fullText.match(pat);
+        if (m) {
+          result.city = (m[1] || m[0]).trim().split(/\s+/).slice(0,3).join(' ');
+          break;
+        }
+      }
+
+      // ---- FATHER NAME ----
+      const fatherPat = /father'?s?\s*name\s*[:\-\|]\s*([A-Za-z][A-Za-z\s]{3,40})/i;
+      const fatherM = fullText.match(fatherPat);
+      if (fatherM) result.fatherName = fatherM[1].trim().split('\n')[0].trim();
+
+      // ---- FATHER OCCUPATION ----
+      const fatherOccPat = /father'?s?\s*(?:occupation|profession|job)\s*[:\-\|]\s*(.{4,60})/i;
+      const fatherOccM = fullText.match(fatherOccPat);
+      if (fatherOccM) result.fatherOcc = fatherOccM[1].trim().split('\n')[0].trim();
+
+      // ---- MOTHER NAME ----
+      const motherPat = /mother'?s?\s*name\s*[:\-\|]\s*([A-Za-z][A-Za-z\s]{3,40})/i;
+      const motherM = fullText.match(motherPat);
+      if (motherM) result.motherName = motherM[1].trim().split('\n')[0].trim();
+
+      // ---- ADDRESS ----
+      const addressPat = /(?:house\s*address|residential\s*address|address)\s*[:\-\|]\s*(.{10,120})/i;
+      const addressM = fullText.match(addressPat);
+      if (addressM) result.address = addressM[1].trim().replace(/\s+/g, ' ');
+
+      // ---- CONTACT ----
+      const contactPat = /(?:contact|phone|mobile|whatsapp|tel)\s*(?:no|number)?[:\-\|]?\s*([+\d][\d\s\-]{8,14})/i;
+      const contactM = fullText.match(contactPat);
+      if (contactM) result.contactNumber = contactM[1].trim();
+
+      // ---- COMPLEXION ----
+      const complexionPat = /(?:complexion|color|colour|skin)\s*[:\-\|]\s*(\w+)/i;
+      const complexionM = fullText.match(complexionPat);
+      if (complexionM) result.complexion = complexionM[1];
+
+      // ---- SECT inference ----
+      if (/\bbarelvi\b/i.test(fullText)) result.sect = 'Barelvi';
+      else if (/\bdeobandi\b/i.test(fullText)) result.sect = 'Deobandi';
+      else if (/\bahle?\s*hadith\b/i.test(fullText)) result.sect = 'Ahle Hadith';
+      else if (/\btablighi\b/i.test(fullText)) result.sect = 'Tablighi';
+      else if (/\bshia\b/i.test(fullText)) result.sect = 'Shia';
+      else if (/\bislam|muslim|sunni\b/i.test(fullText)) result.sect = 'Sunni';
+
+      return result;
     }
 
-    function switchTab(tabId) {
-      document.querySelectorAll('.nav-tab').forEach((t, i) => {
-        t.classList.toggle('active', ['profiles', 'scanner', 'matchmaker', 'pipeline'][i] === tabId);
-      });
-      document.querySelectorAll('.view-content').forEach(v => {
-        v.classList.remove('active');
-      });
-      document.getElementById(`view-${tabId}`).classList.add('active');
-
-      if (tabId === 'matchmaker') {
-        populateTargetSelect();
-        runMatchmaker();
-      } else if (tabId === 'pipeline') {
-        renderPipeline();
-      } else if (tabId === 'profiles') {
-        renderProfiles();
-      }
+    function inferEducationTier(edu) {
+      if (!edu) return 4;
+      const e = edu.toLowerCase();
+      if (/phd|doctorate|d\.phil|post.?doc|doctor\s*of/i.test(e)) return 6;
+      if (/master|m\.s|m\.com|mba|mbbs|m\.d|m\.tech|m\.e\b|m\.b\.a|m\.a\b|m\.sc|post.?grad|ca\b|chartered/i.test(e)) return 5;
+      if (/bachelor|b\.e|b\.com|b\.tech|be\b|b\.sc|llb|b\.a\b|b\.ed|b\.arch|engineering\b/i.test(e)) return 4;
+      if (/diploma|3.year|certificate|polytechnic/i.test(e)) return 3;
+      if (/12th|hsc|inter|fsc|a.level|higher secondary|pu\s*college|pre.?uni/i.test(e)) return 2;
+      if (/10th|ssc|matric|o.level|high school|secondary/i.test(e)) return 1;
+      return 4;
     }
 
-    function setFilter(filter, el) {
-      currentFilter = filter;
-      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-      renderProfiles();
+    function toTitleCase(str) {
+      return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
     }
 
     function parseHeightToInches(str) {
-      const match = str.match(/([4-6])\s*(?:'|ft|\.)\s*([0-9]|1[0-1])/);
-      if (match) {
-        return (parseInt(match[1]) * 12) + parseInt(match[2]);
-      }
-      return 67.0;
+      if (!str) return 67;
+      // 5'11" or 5' 11
+      let m = str.match(/([4-7])['\u2019]\s*([0-9]|1[0-1])/);
+      if (m) return parseInt(m[1]) * 12 + parseInt(m[2]);
+      // 5.8 ft
+      m = str.match(/([4-7])\.([0-9]|1[0-1])/);
+      if (m) return parseInt(m[1]) * 12 + parseInt(m[2]);
+      // 5 ft 11 in
+      m = str.match(/([4-7])\s*(?:ft|feet)\s*([0-9]|1[0-1])/i);
+      if (m) return parseInt(m[1]) * 12 + parseInt(m[2]);
+      return 67;
     }
 
-    function updateStats() {
-      document.getElementById('statTotal').innerText = candidates.length;
-      document.getElementById('statGrooms').innerText = candidates.filter(c => c.gender === 'Male').length;
-      document.getElementById('statBrides').innerText = candidates.filter(c => c.gender === 'Female').length;
-      document.getElementById('statProposals').innerText = proposals.filter(p => p.stage !== 'closed').length;
-      document.getElementById('statAccepted').innerText = proposals.filter(p => p.stage === 'shortlisted').length;
+    // ===================== PHOTO HANDLING =====================
+    function triggerPhotoUpload(idx) { document.getElementById('photoInput' + idx).click(); }
+
+    function handlePhotoUpload(idx, e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        currentPhotos[idx] = ev.target.result;
+        const slot = document.getElementById('photoSlot' + idx);
+        slot.innerHTML = `<img src="${ev.target.result}" alt="Photo ${idx+1}">
+          <button class="del-btn" onclick="removePhoto(${idx}, event)">✕</button>`;
+      };
+      reader.readAsDataURL(file);
     }
 
-    function renderProfiles() {
-      updateStats();
-      const container = document.getElementById('candidatesList');
-      const search = (document.getElementById('searchInput').value || '').toLowerCase();
-
-      let filtered = candidates.filter(c => {
-        if (currentFilter === 'Male' && c.gender !== 'Male') return false;
-        if (currentFilter === 'Female' && c.gender !== 'Female') return false;
-        if (currentFilter === 'Barelvi' && c.sect !== 'Barelvi') return false;
-        if (currentFilter === 'Deobandi' && c.sect !== 'Deobandi') return false;
-        if (currentFilter === 'Sheikh' && c.caste !== 'Sheikh') return false;
-        if (currentFilter === 'Syed' && c.caste !== 'Syed') return false;
-
-        if (search) {
-          const matchStr = `${c.name} ${c.sect} ${c.caste} ${c.city} ${c.agentReferenceName}`.toLowerCase();
-          return matchStr.includes(search);
-        }
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div style="text-align:center; padding: 40px 10px; color:#94a3b8;">No candidates match your filter.</div>`;
-        return;
-      }
-
-      container.innerHTML = filtered.map(c => {
-        const isMale = c.gender === 'Male';
-        return `
-          <div class="candidate-card ${isMale ? 'male' : 'female'}">
-            <div class="card-header">
-              <div class="avatar ${isMale ? 'male' : 'female'}">${isMale ? '👨' : '🧕'}</div>
-              <div class="header-details">
-                <div class="c-name">${c.name} (${c.gender})</div>
-                <div class="c-sub">${c.age} yrs • ${c.heightDisplay} • ${c.city}</div>
-              </div>
-              <span class="badge-status status-${c.pipelineStatus}">${c.pipelineStatus.replace('_', ' ')}</span>
-            </div>
-
-            <div class="card-chips">
-              <span class="chip chip-sect">🕌 ${c.sect}</span>
-              <span class="chip chip-caste">👥 ${c.caste}</span>
-              <span class="chip chip-edu">🎓 ${c.education} (Tier ${c.educationTier})</span>
-            </div>
-
-            <div class="card-footer">
-              <span class="agent-ref">Ref: ${c.agentReferenceName}</span>
-              <button class="btn-match" onclick="selectForMatching('${c.id}')">
-                ❤️ Find Matches
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
+    function removePhoto(idx, e) {
+      e.stopPropagation();
+      currentPhotos[idx] = '';
+      const slot = document.getElementById('photoSlot' + idx);
+      const labels = ['👤', '+', '+'];
+      slot.innerHTML = `<span>${labels[idx]}</span><span style="font-size:9px;margin-top:2px;color:#94a3b8;">Photo ${idx+1}</span>`;
     }
 
-    function selectForMatching(id) {
-      switchTab('matchmaker');
-      document.getElementById('targetCandidateSelect').value = id;
-      runMatchmaker();
+    function handleBiodataUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        currentBiodataImg = ev.target.result;
+        document.getElementById('biodataPreviewImg').src = ev.target.result;
+        document.getElementById('biodataScanPreview').style.display = 'block';
+        simulateOCR(file.name);
+      };
+      reader.readAsDataURL(file);
     }
 
-    function populateTargetSelect() {
-      const sel = document.getElementById('targetCandidateSelect');
-      sel.innerHTML = candidates.map(c => `
-        <option value="${c.id}">${c.name} (${c.gender}, ${c.age}y, ${c.sect}, ${c.caste}, ${c.heightDisplay})</option>
-      `).join('');
+    function simulateOCR(filename) {
+      const status = document.getElementById('ocrStatus');
+      status.className = 'ocr-status info';
+      status.textContent = '🔍 Scanning bio-data... Extracting fields...';
+
+      // Simulate parsing delay then fill with heuristic based on filename
+      setTimeout(() => {
+        status.className = 'ocr-status warning';
+        status.textContent = '⚠️ Image uploaded. Please verify fields below and correct any errors before saving.';
+      }, 1200);
     }
 
-    // STRICT MATCHING ENGINE LOGIC
-    function validateStrictRules(target, candidate) {
-      const reasons = [];
-
-      // 1. Gender Complementarity
-      const isGenderComplementary = (target.gender === 'Male' && candidate.gender === 'Female') ||
-                                    (target.gender === 'Female' && candidate.gender === 'Male');
-      if (!isGenderComplementary) reasons.push(`Gender Conflict: Both are ${target.gender}`);
-
-      // 2. Sect (Maslak) Compatibility (Strict Exact Match)
-      const isSectMatch = target.sect.trim().toLowerCase() === candidate.sect.trim().toLowerCase();
-      if (!isSectMatch) reasons.push(`Sect Mismatch: "${target.sect}" vs "${candidate.sect}"`);
-
-      // 3. Caste (Biradari) Compatibility (Strict Exact Match)
-      const isCasteMatch = target.caste.trim().toLowerCase() === candidate.caste.trim().toLowerCase();
-      if (!isCasteMatch) reasons.push(`Caste Mismatch: "${target.caste}" vs "${candidate.caste}"`);
-
-      const male = target.gender === 'Male' ? target : candidate;
-      const female = target.gender === 'Female' ? target : candidate;
-
-      let isHeightValid = false;
-      let isEducationValid = false;
-
-      if (male && female && isGenderComplementary) {
-        // 4. Male Height strictly > Female Height
-        isHeightValid = male.heightInches > female.heightInches;
-        if (!isHeightValid) {
-          reasons.push(`Height Constraint: Groom (${male.heightDisplay}) must be taller than Bride (${female.heightDisplay})`);
-        }
-
-        // 5. Male Education Tier >= Female Education Tier
-        isEducationValid = male.educationTier >= female.educationTier;
-        if (!isEducationValid) {
-          reasons.push(`Education Hierarchy: Groom (Tier ${male.educationTier}) must be >= Bride (Tier ${female.educationTier})`);
-        }
-      }
-
-      const isFullMatch = isGenderComplementary && isSectMatch && isCasteMatch && isHeightValid && isEducationValid;
-      return { isFullMatch, reasons, isSectMatch, isCasteMatch, isHeightValid, isEducationValid };
-    }
-
-    function runMatchmaker() {
-      const targetId = document.getElementById('targetCandidateSelect').value;
-      const target = candidates.find(c => c.id === targetId);
-      if (!target) return;
-
-      const strictOnly = document.getElementById('chkStrictOnly').checked;
-      const pool = candidates.filter(c => c.id !== target.id);
-
-      const results = [];
-      pool.forEach(c => {
-        const val = validateStrictRules(target, c);
-        if (strictOnly && !val.isFullMatch) return;
-
-        let score = 50;
-        if (val.isFullMatch) {
-          const maleAge = target.gender === 'Male' ? target.age : c.age;
-          const femaleAge = target.gender === 'Female' ? target.age : c.age;
-          const ageDiff = maleAge - femaleAge;
-          if (ageDiff >= 1 && ageDiff <= 4) score += 25;
-          else if (ageDiff >= 0 && ageDiff <= 6) score += 15;
-
-          if (target.city.toLowerCase() === c.city.toLowerCase()) score += 15;
-          score += 10;
-        } else {
-          score = 0;
-        }
-
-        results.push({ candidate: c, validation: val, score: Math.min(100, score) });
-      });
-
-      results.sort((a, b) => b.score - a.score);
-
-      document.getElementById('matchResultsCount').innerText = `${results.length} Candidates Evaluated`;
-      const container = document.getElementById('matchingCardsContainer');
-
-      if (results.length === 0) {
-        container.innerHTML = `
-          <div style="background:#fff; border-radius:12px; padding:30px 16px; text-align:center; border:1px solid #e2e8f0;">
-            <div style="font-size:32px; margin-bottom:8px;">🔍</div>
-            <div style="font-weight:700; font-size:14px;">No Strict Matches Found</div>
-            <div style="font-size:11px; color:#64748b; margin-top:4px;">
-              No opposite candidates cleared all 4 strict criteria (Exact Sect "${target.sect}", Exact Caste "${target.caste}", Male &gt; Female Height, and Groom Edu &gt;= Bride Edu).
-            </div>
-            <button onclick="document.getElementById('chkStrictOnly').checked=false; runMatchmaker();" style="margin-top:12px; padding:6px 12px; background:#e2e8f0; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">
-              Show Incompatible Candidates (Diagnostics)
-            </button>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = results.map(r => {
-        const c = r.candidate;
-        const val = r.validation;
-        const isMale = c.gender === 'Male';
-        return `
-          <div class="match-card ${val.isFullMatch ? 'pass' : 'fail'}">
-            <div class="match-top">
-              <div>
-                <div style="font-weight:700; font-size:15px;">${c.name} (${c.gender})</div>
-                <div style="font-size:11px; color:#64748b;">${c.age} yrs • ${c.heightDisplay} • ${c.city}</div>
-              </div>
-              <div class="score-badge ${val.isFullMatch ? 'pass' : 'fail'}">
-                ${val.isFullMatch ? r.score + '%' : 'FAIL'}
-                <span>${val.isFullMatch ? 'MATCH' : 'INELIGIBLE'}</span>
-              </div>
-            </div>
-
-            <div class="rule-check-grid">
-              <div class="rule-item ${val.isSectMatch ? 'ok' : 'bad'}">
-                ${val.isSectMatch ? '✓' : '✗'} Sect: ${c.sect} ${val.isSectMatch ? '(Exact Match)' : '(Mismatch)'}
-              </div>
-              <div class="rule-item ${val.isCasteMatch ? 'ok' : 'bad'}">
-                ${val.isCasteMatch ? '✓' : '✗'} Caste: ${c.caste} ${val.isCasteMatch ? '(Exact Match)' : '(Mismatch)'}
-              </div>
-              <div class="rule-item ${val.isHeightValid ? 'ok' : 'bad'}">
-                ${val.isHeightValid ? '✓' : '✗'} Height Rule: Groom must be taller than Bride
-              </div>
-              <div class="rule-item ${val.isEducationValid ? 'ok' : 'bad'}">
-                ${val.isEducationValid ? '✓' : '✗'} Education Rule: Groom tier (${target.gender==='Male'?target.educationTier:c.educationTier}) &gt;= Bride tier (${target.gender==='Female'?target.educationTier:c.educationTier})
-              </div>
-            </div>
-
-            ${!val.isFullMatch ? `
-              <div style="background:#fee2e2; color:#b91c1c; font-size:10px; padding:6px; border-radius:6px; margin-bottom:8px; font-weight:600;">
-                ${val.rejectionReasons.join(' • ')}
-              </div>
-            ` : ''}
-
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:11px; color:#64748b;">Ref: ${c.agentReferenceName}</span>
-              ${val.isFullMatch ? `
-                <button onclick="createProposal('${target.id}', '${c.id}')" style="background:#047857; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">
-                  🚀 Dispatch Proposal
-                </button>
-              ` : `
-                <span style="font-size:11px; color:#ef4444; font-weight:600;">Disqualified</span>
-              `}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function createProposal(idA, idB) {
-      const a = candidates.find(c => c.id === idA);
-      const b = candidates.find(c => c.id === idB);
-      const male = a.gender === 'Male' ? a : b;
-      const female = a.gender === 'Female' ? a : b;
-
-      proposals.push({
-        id: `prop-${Date.now()}`,
-        maleId: male.id,
-        femaleId: female.id,
-        maleName: male.name,
-        femaleName: female.name,
-        sect: male.sect,
-        caste: male.caste,
-        stage: "proposal_sent",
-        notes: `Proposal dispatched on ${new Date().toLocaleDateString()}.`
-      });
-
-      alert(`Proposal between ${male.name} and ${female.name} created and moved to "Proposal Sent" stage!`);
-      switchTab('pipeline');
-    }
-
-    function renderPipeline() {
-      const board = document.getElementById('pipelineBoard');
-      board.innerHTML = stages.map(stage => {
-        const stageProps = proposals.filter(p => p.stage === stage.key);
-        return `
-          <div class="pipeline-stage-box">
-            <div class="stage-header" style="background: ${stage.color};">
-              <span>${stage.label}</span>
-              <span style="background:rgba(255,255,255,0.25); padding:2px 8px; border-radius:12px; font-size:11px;">${stageProps.length}</span>
-            </div>
-            <div class="stage-items">
-              ${stageProps.length === 0 ? `<div style="font-size:11px; color:#94a3b8; text-align:center; padding:10px;">No proposals in this stage</div>` : ''}
-              ${stageProps.map(p => `
-                <div class="proposal-card">
-                  <div class="proposal-pair">
-                    <span>👨 ${p.maleName}</span>
-                    <span style="color:#64748b;">🤝</span>
-                    <span>🧕 ${p.femaleName}</span>
-                  </div>
-                  <div style="font-size:11px; color:#64748b;">Sect: ${p.sect} • Caste: ${p.caste}</div>
-                  <div style="font-size:11px; color:#334155; margin-top:4px;">"${p.notes}"</div>
-                  <div class="proposal-actions">
-                    <span style="font-size:10px; color:#94a3b8;">Offline SQLite</span>
-                    <button class="btn-advance" onclick="advanceStage('${p.id}')">Advance Stage ➔</button>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function advanceStage(propId) {
-      const p = proposals.find(item => item.id === propId);
-      if (!p) return;
-      const order = ["pending_review", "proposal_sent", "family_discussion", "shortlisted", "closed"];
-      const currentIdx = order.indexOf(p.stage);
-      const nextStage = order[(currentIdx + 1) % order.length];
-      p.stage = nextStage;
-      p.notes += ` | Stage updated to ${nextStage} on ${new Date().toLocaleTimeString()}`;
-      renderPipeline();
-      updateStats();
+    // ===================== FORM FILL =====================
+    function fillFormFromOCR(parsed) {
+      if (parsed.name) document.getElementById('formName').value = parsed.name;
+      if (parsed.gender) document.getElementById('formGender').value = parsed.gender;
+      if (parsed.dob) document.getElementById('formDob').value = parsed.dob;
+      if (parsed.age) document.getElementById('formAge').value = parsed.age;
+      if (parsed.heightDisplay) document.getElementById('formHeight').value = parsed.heightDisplay;
+      if (parsed.complexion) document.getElementById('formComplexion').value = parsed.complexion;
+      if (parsed.education) document.getElementById('formEdu').value = parsed.education;
+      if (parsed.educationTier) document.getElementById('formEduTier').value = parsed.educationTier;
+      if (parsed.occupation) document.getElementById('formOccupation').value = parsed.occupation;
+      if (parsed.sect) document.getElementById('formSect').value = parsed.sect;
+      if (parsed.caste) document.getElementById('formCaste').value = parsed.caste;
+      if (parsed.city) document.getElementById('formCity').value = parsed.city;
+      if (parsed.contactNumber) document.getElementById('formPhone').value = parsed.contactNumber;
+      if (parsed.fatherName) document.getElementById('formFatherName').value = parsed.fatherName;
+      if (parsed.fatherOcc) document.getElementById('formFatherOcc').value = parsed.fatherOcc;
+      if (parsed.motherName) document.getElementById('formMotherName').value = parsed.motherName;
+      if (parsed.address) document.getElementById('formAddress').value = parsed.address;
     }
 
     function loadSample(num) {
-      if (num === 1) {
-        document.getElementById('formName').value = "Tariq Sheikh";
-        document.getElementById('formGender').value = "Male";
-        document.getElementById('formAge').value = "28";
-        document.getElementById('formHeight').value = "5' 11\"";
-        document.getElementById('formWeight').value = "74";
-        document.getElementById('formSect').value = "Barelvi";
-        document.getElementById('formCaste').value = "Sheikh";
-        document.getElementById('formEdu').value = "MS Computer Science";
-        document.getElementById('formEduTier').value = "5";
-        document.getElementById('formCity').value = "Lahore";
-        document.getElementById('formPhone').value = "+92 300 1234567";
-        document.getElementById('formAgent').value = "Haji Aslam Bureau";
-      } else if (num === 2) {
-        document.getElementById('formName').value = "Fatima Sheikh";
-        document.getElementById('formGender').value = "Female";
-        document.getElementById('formAge').value = "25";
-        document.getElementById('formHeight').value = "5' 5\"";
-        document.getElementById('formWeight').value = "58";
-        document.getElementById('formSect').value = "Barelvi";
-        document.getElementById('formCaste').value = "Sheikh";
-        document.getElementById('formEdu').value = "BSc Psychology";
-        document.getElementById('formEduTier').value = "4";
-        document.getElementById('formCity').value = "Lahore";
-        document.getElementById('formPhone').value = "+92 321 9876543";
-        document.getElementById('formAgent').value = "Direct Family Reference";
-      } else {
-        document.getElementById('formName').value = "Imran Rajput";
-        document.getElementById('formGender').value = "Male";
-        document.getElementById('formAge').value = "31";
-        document.getElementById('formHeight').value = "6' 0\"";
-        document.getElementById('formWeight').value = "78";
-        document.getElementById('formSect').value = "Deobandi";
-        document.getElementById('formCaste').value = "Rajput";
-        document.getElementById('formEdu').value = "PhD Biotechnology";
-        document.getElementById('formEduTier').value = "6";
-        document.getElementById('formCity').value = "Islamabad";
-        document.getElementById('formPhone').value = "+92 333 9988776";
-        document.getElementById('formAgent').value = "Subhan Bureau Rawalpindi";
-      }
-      alert('Sample bio-data loaded into verification form! You can edit any field before saving.');
+      const samples = {
+        1: { name: "Suhel Jafar Melmuri", gender: "Male", dob: "06 March 1997", age: 26, heightDisplay: "5' 8\"", heightInches: 68, complexion: "Dusky", education: "Diploma in Civil Engineering", educationTier: 3, occupation: "Businessman (Poultry farms, Golden Layout)", sect: "Sunni", caste: "Melmuri", city: "Hubli", contactNumber: "", fatherName: "Mohammed Jafar Melmuri", fatherOcc: "Businessman (Poultry & Layout Developer)", motherName: "Parveen Jafar Melmuri", address: "Ukt Hill's, Gudihal Road, Near Nihal Hall, Jivishwari Layout, Hubli – 580028" },
+        2: { name: "Rameezraja Hosuri", gender: "Male", dob: "16 March 1993", age: 31, heightDisplay: "5' 5\"", heightInches: 65, complexion: "Fair", education: "Bachelor of Commerce (B.Com)", educationTier: 4, occupation: "Revenue Assistant @ HESCOM (Hubli Electricity Supply Company Ltd)", sect: "Sunni", caste: "Hosuri", city: "Gokak", contactNumber: "", fatherName: "Gousmoddin Hosuri", fatherOcc: "Businessman", motherName: "Mehajabeen Hosuri", address: "Gokak" },
+        3: { name: "Isharat Mujawar", gender: "Female", dob: "30-09-1999", age: 25, heightDisplay: "5' 1\"", heightInches: 61, complexion: "Fair", education: "Bachelor of Engineering in CSE (Kls Gogte Institute of Technology, Belagavi)", educationTier: 4, occupation: "System Engineer at TCS (Tata Consultancy Services)", sect: "Sunni", caste: "Mujawar", city: "Ramdurg, Belagavi", contactNumber: "9448636922", fatherName: "Dadabashasaheb D Mujawar", fatherOcc: "Lecturer & Principal, Govt PU College, Ramdurg", motherName: "Bibi Sairah Mujawar", address: "Jaya Nagar near New Bustand, Ramdurg, Belagavi 591123" }
+      };
+      const s = samples[num];
+      if (!s) return;
+      fillFormFromOCR(s);
+      const status = document.getElementById('ocrStatus');
+      status.className = 'ocr-status success';
+      status.textContent = `✅ Sample loaded: ${s.name}. All fields parsed. Verify and save.`;
     }
 
-    function handleImageUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      // Heuristic OCR simulation
-      alert(`Simulating on-device OCR scan for: ${file.name}...\nExtracting Candidate Name, Height, Maslak, Caste, and Reference Agent.`);
-      loadSample(2); // Auto-populate with sample extraction
-    }
-
+    // ===================== SAVE CANDIDATE =====================
     function saveCandidateFromForm() {
       const name = document.getElementById('formName').value.trim();
       const agent = document.getElementById('formAgent').value.trim();
@@ -1435,29 +893,472 @@
 
       const newCand = {
         id: `c-${Date.now()}`,
-        name: name,
+        name,
         gender: document.getElementById('formGender').value,
+        dob: document.getElementById('formDob').value.trim(),
         age: parseInt(document.getElementById('formAge').value) || 26,
-        heightInches: heightInches,
-        heightDisplay: heightStr,
-        weightKg: parseFloat(document.getElementById('formWeight').value) || 65,
+        heightInches,
+        heightDisplay: heightStr || `${Math.floor(heightInches/12)}' ${heightInches%12}"`,
+        complexion: document.getElementById('formComplexion').value.trim(),
         education: document.getElementById('formEdu').value.trim(),
         educationTier: parseInt(document.getElementById('formEduTier').value) || 4,
+        occupation: document.getElementById('formOccupation').value.trim(),
         sect: document.getElementById('formSect').value,
         caste: document.getElementById('formCaste').value.trim(),
         city: document.getElementById('formCity').value.trim(),
         contactNumber: document.getElementById('formPhone').value.trim(),
         agentReferenceName: agent,
+        fatherName: document.getElementById('formFatherName').value.trim(),
+        fatherOcc: document.getElementById('formFatherOcc').value.trim(),
+        motherName: document.getElementById('formMotherName').value.trim(),
+        address: document.getElementById('formAddress').value.trim(),
         pipelineStatus: "pending_review",
-        notes: "Scanned & verified candidate profile."
+        notes: document.getElementById('formNotes').value.trim(),
+        photos: currentPhotos.filter(p => p)
       };
 
       candidates.unshift(newCand);
-      alert(`Candidate "${name}" successfully saved into local SQLite database!`);
+      currentPhotos = ['', '', ''];
+      // Reset photo slots
+      ['👤', '+', '+'].forEach((lbl, i) => {
+        document.getElementById(`photoSlot${i}`).innerHTML = `<span>${lbl}</span><span style="font-size:9px;margin-top:2px;color:#94a3b8;">Photo ${i+1}</span>`;
+      });
+
+      alert(`✅ "${name}" saved to local database! Running matchmaker...`);
       selectForMatching(newCand.id);
     }
 
-    // Initialize on load
+    // ===================== RENDER PROFILES =====================
+    function updateStats() {
+      document.getElementById('statTotal').innerText = candidates.length;
+      document.getElementById('statGrooms').innerText = candidates.filter(c => c.gender === 'Male').length;
+      document.getElementById('statBrides').innerText = candidates.filter(c => c.gender === 'Female').length;
+      document.getElementById('statProposals').innerText = proposals.filter(p => p.stage !== 'closed').length;
+      document.getElementById('statAccepted').innerText = proposals.filter(p => p.stage === 'shortlisted').length;
+    }
+
+    function setFilter(filter, el) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderProfiles();
+    }
+
+    function renderProfiles() {
+      updateStats();
+      const container = document.getElementById('candidatesList');
+      const search = (document.getElementById('searchInput').value || '').toLowerCase();
+      let filtered = candidates.filter(c => {
+        if (currentFilter === 'Male' && c.gender !== 'Male') return false;
+        if (currentFilter === 'Female' && c.gender !== 'Female') return false;
+        if (currentFilter === 'Barelvi' && c.sect !== 'Barelvi') return false;
+        if (currentFilter === 'Deobandi' && c.sect !== 'Deobandi') return false;
+        if (currentFilter === 'Sheikh' && c.caste !== 'Sheikh') return false;
+        if (currentFilter === 'Syed' && c.caste !== 'Syed') return false;
+        if (search) {
+          const s = `${c.name} ${c.sect} ${c.caste} ${c.city} ${c.agentReferenceName} ${c.occupation||''} ${c.dob||''}`.toLowerCase();
+          return s.includes(search);
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center;padding:40px;color:#94a3b8;">No candidates found.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(c => {
+        const isMale = c.gender === 'Male';
+        const picHtml = c.photos && c.photos[0]
+          ? `<img src="${c.photos[0]}" alt="${c.name}">`
+          : (isMale ? '👨' : '🧕');
+        const photoStrip = c.photos && c.photos.length > 1
+          ? `<div class="photo-strip">${c.photos.map(p => `<img class="photo-thumb" src="${p}" alt="">`).join('')}</div>` : '';
+        return `
+          <div class="candidate-card ${isMale ? 'male' : 'female'}" onclick="openProfile('${c.id}')">
+            <div class="card-header">
+              <div class="avatar ${c.photos && c.photos[0] ? '' : (isMale ? 'male' : 'female')}">${picHtml}</div>
+              <div class="header-details">
+                <div class="c-name">${c.name} <span style="font-size:11px;color:${isMale ? '#1e3a8a' : '#be185d'};font-weight:600;">(${c.gender})</span></div>
+                <div class="c-sub">${c.age} yrs • ${c.heightDisplay} • ${c.city || '-'}</div>
+                ${c.dob ? `<div class="c-dob">🗓️ DOB: ${c.dob}</div>` : ''}
+              </div>
+              <span class="badge-status status-${c.pipelineStatus}">${c.pipelineStatus.replace(/_/g,' ')}</span>
+            </div>
+            ${photoStrip}
+            <div class="card-chips">
+              <span class="chip chip-sect">🕌 ${c.sect}</span>
+              <span class="chip chip-caste">👥 ${c.caste}</span>
+              <span class="chip chip-edu">🎓 ${c.education ? c.education.substring(0,30) : '-'} (T${c.educationTier})</span>
+              ${c.occupation ? `<span class="chip chip-occ">💼 ${c.occupation.substring(0,30)}</span>` : ''}
+            </div>
+            <div class="card-footer">
+              <span class="agent-ref">Ref: ${c.agentReferenceName}</span>
+              <div class="card-actions" onclick="event.stopPropagation()">
+                <button class="btn-share" onclick="openShareCard('${c.id}')">💬 Share</button>
+                <button class="btn-match" onclick="selectForMatching('${c.id}')">❤️ Match</button>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ===================== PROFILE MODAL =====================
+    function openProfile(id) {
+      const c = candidates.find(x => x.id === id);
+      if (!c) return;
+      const isMale = c.gender === 'Male';
+
+      // Avatar
+      const modalAvatar = document.getElementById('modalAvatar');
+      if (c.photos && c.photos[0]) {
+        modalAvatar.innerHTML = `<img src="${c.photos[0]}" alt="${c.name}">`;
+      } else {
+        modalAvatar.innerHTML = isMale ? '👨' : '🧕';
+      }
+
+      document.getElementById('modalName').textContent = c.name;
+      document.getElementById('modalMeta').textContent = `${c.gender} • ${c.age} yrs • ${c.heightDisplay} • ${c.city || '-'}`;
+
+      // Body
+      const body = document.getElementById('modalBody');
+      const field = (label, val) => val ? `<div class="profile-row"><span class="profile-label">${label}</span><span class="profile-value">${val}</span></div>` : '';
+
+      body.innerHTML = `
+        <div class="profile-section">
+          <div class="profile-section-title">Personal Details</div>
+          ${field('Full Name', c.name)}
+          ${field('Gender', c.gender)}
+          ${field('Date of Birth', c.dob)}
+          ${field('Age', c.age ? c.age + ' years' : null)}
+          ${field('Height', c.heightDisplay)}
+          ${field('Complexion', c.complexion)}
+          ${field('Sect (Maslak)', c.sect)}
+          ${field('Caste (Biradari)', c.caste)}
+          ${field('City', c.city)}
+          ${field('Contact / WhatsApp', c.contactNumber)}
+          ${field('Address', c.address)}
+        </div>
+        <div class="profile-section">
+          <div class="profile-section-title">Education & Profession</div>
+          ${field('Qualification', c.education)}
+          ${field('Education Tier', c.educationTier ? 'Tier ' + c.educationTier : null)}
+          ${field('Occupation', c.occupation)}
+        </div>
+        <div class="profile-section">
+          <div class="profile-section-title">Family Background</div>
+          ${field("Father's Name", c.fatherName)}
+          ${field("Father's Occupation", c.fatherOcc)}
+          ${field("Mother's Name", c.motherName)}
+        </div>
+        ${c.notes ? `<div class="profile-section"><div class="profile-section-title">Notes</div><div style="font-size:12px;color:#334155;">${c.notes}</div></div>` : ''}
+        ${c.photos && c.photos.length > 0 ? `
+        <div class="profile-section">
+          <div class="profile-section-title">Photos</div>
+          <div class="photos-gallery">
+            ${c.photos.map(p => `<img class="gallery-photo" src="${p}" alt="photo">`).join('')}
+          </div>
+        </div>` : ''}
+      `;
+
+      document.getElementById('modalActions').innerHTML = `
+        <button class="btn-modal primary" onclick="selectForMatching('${c.id}');closeProfileModal()">❤️ Find Matches</button>
+        <button class="btn-modal whatsapp" onclick="openShareCard('${c.id}');closeProfileModal()">💬 Share on WhatsApp</button>
+        <button class="btn-modal download" onclick="downloadShareCard('${c.id}');closeProfileModal()">⬇️ Download Profile</button>
+      `;
+
+      document.getElementById('profileModal').classList.add('open');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').classList.remove('open');
+    }
+
+    // ===================== SHARE CARD =====================
+    function openShareCard(id) {
+      const c = candidates.find(x => x.id === id);
+      if (!c) return;
+      const isMale = c.gender === 'Male';
+
+      // Header pic
+      const picEl = document.getElementById('shareCardPic');
+      if (c.photos && c.photos[0]) {
+        picEl.innerHTML = `<img src="${c.photos[0]}" alt="${c.name}">`;
+      } else {
+        picEl.innerHTML = isMale ? '👨' : '🧕';
+      }
+
+      document.getElementById('shareCardName').textContent = c.name;
+      document.getElementById('shareCardMeta').textContent = `${c.gender} • ${c.age} yrs • ${c.heightDisplay} • ${c.city || ''}`;
+
+      const row = (lbl, val) => val ? `<div class="share-row"><span class="share-label">${lbl}</span><span class="share-val">${val}</span></div>` : '';
+      document.getElementById('shareCardBody').innerHTML = `
+        ${row('Date of Birth', c.dob)}
+        ${row('Height', c.heightDisplay)}
+        ${row('Complexion', c.complexion)}
+        ${row('Sect', c.sect)}
+        ${row('Caste', c.caste)}
+        ${row('Education', c.education)}
+        ${row('Occupation', c.occupation)}
+        ${row("Father's Name", c.fatherName)}
+        ${row("Father's Occ.", c.fatherOcc)}
+        ${row('Contact', c.contactNumber)}
+        ${row('Address', c.address ? c.address.substring(0,60) : null)}
+        ${row('Reference', c.agentReferenceName)}
+      `;
+
+      // Photos
+      const photosEl = document.getElementById('shareCardPhotos');
+      if (c.photos && c.photos.length > 0) {
+        photosEl.style.display = 'flex';
+        photosEl.innerHTML = c.photos.map(p => `<img class="share-photo" src="${p}" alt="photo">`).join('');
+      } else {
+        photosEl.style.display = 'none';
+      }
+
+      document.getElementById('shareCardContainer').classList.add('open');
+      // Store current share id
+      document.getElementById('shareCardContainer').dataset.cid = id;
+    }
+
+    function closeShareCard() {
+      document.getElementById('shareCardContainer').classList.remove('open');
+    }
+
+    function sendToWhatsApp() {
+      const id = document.getElementById('shareCardContainer').dataset.cid;
+      const c = candidates.find(x => x.id === id);
+      if (!c) return;
+      const text = `*💍 NikahBureau Pro — Rishta Profile*\n\n` +
+        `*Name:* ${c.name}\n` +
+        `*Gender:* ${c.gender}\n` +
+        (c.dob ? `*Date of Birth:* ${c.dob}\n` : '') +
+        `*Age:* ${c.age} years\n` +
+        `*Height:* ${c.heightDisplay}\n` +
+        (c.complexion ? `*Complexion:* ${c.complexion}\n` : '') +
+        `*Sect:* ${c.sect}\n` +
+        `*Caste:* ${c.caste}\n` +
+        `*Education:* ${c.education}\n` +
+        (c.occupation ? `*Occupation:* ${c.occupation}\n` : '') +
+        (c.fatherName ? `*Father:* ${c.fatherName}\n` : '') +
+        (c.fatherOcc ? `*Father's Occ:* ${c.fatherOcc}\n` : '') +
+        (c.city ? `*City:* ${c.city}\n` : '') +
+        (c.contactNumber ? `*Contact:* ${c.contactNumber}\n` : '') +
+        `*Reference:* ${c.agentReferenceName}\n\n` +
+        `_Shared via NikahBureau Pro · Confidential_`;
+
+      const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    function downloadShareCard() {
+      const card = document.getElementById('shareCard');
+      // Use html2canvas if available, else generate text file
+      const id = document.getElementById('shareCardContainer').dataset.cid;
+      const c = candidates.find(x => x.id === id);
+      if (!c) return;
+      const content = `NikahBureau Pro — Rishta Profile\n================================\n` +
+        `Name: ${c.name}\nGender: ${c.gender}\n` +
+        (c.dob ? `Date of Birth: ${c.dob}\n` : '') +
+        `Age: ${c.age} years\nHeight: ${c.heightDisplay}\n` +
+        (c.complexion ? `Complexion: ${c.complexion}\n` : '') +
+        `Sect: ${c.sect}\nCaste: ${c.caste}\n` +
+        `Education: ${c.education}\n` +
+        (c.occupation ? `Occupation: ${c.occupation}\n` : '') +
+        (c.fatherName ? `Father's Name: ${c.fatherName}\n` : '') +
+        (c.fatherOcc ? `Father's Occupation: ${c.fatherOcc}\n` : '') +
+        (c.motherName ? `Mother's Name: ${c.motherName}\n` : '') +
+        (c.city ? `City: ${c.city}\n` : '') +
+        (c.address ? `Address: ${c.address}\n` : '') +
+        (c.contactNumber ? `Contact: ${c.contactNumber}\n` : '') +
+        `Reference Agent: ${c.agentReferenceName}\n` +
+        (c.notes ? `Notes: ${c.notes}\n` : '') +
+        `\n--- NikahBureau Pro · Confidential ---`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${c.name.replace(/\s+/g,'_')}_RishtaProfile.txt`;
+      a.click();
+    }
+
+    // ===================== MATCHMAKER =====================
+    function selectForMatching(id) {
+      switchTab('matchmaker');
+      const sel = document.getElementById('targetCandidateSelect');
+      if (sel) sel.value = id;
+      runMatchmaker();
+    }
+
+    function populateTargetSelect() {
+      const sel = document.getElementById('targetCandidateSelect');
+      sel.innerHTML = candidates.map(c =>
+        `<option value="${c.id}">${c.name} (${c.gender}, ${c.age}y, ${c.sect}, ${c.caste}, ${c.heightDisplay})</option>`
+      ).join('');
+    }
+
+    function validateStrictRules(target, candidate) {
+      const reasons = [];
+      const isGenderComplementary = (target.gender === 'Male' && candidate.gender === 'Female') ||
+                                    (target.gender === 'Female' && candidate.gender === 'Male');
+      if (!isGenderComplementary) reasons.push(`Gender Conflict: Both are ${target.gender}`);
+      const isSectMatch = target.sect.trim().toLowerCase() === candidate.sect.trim().toLowerCase();
+      if (!isSectMatch) reasons.push(`Sect Mismatch: "${target.sect}" vs "${candidate.sect}"`);
+      const isCasteMatch = target.caste.trim().toLowerCase() === candidate.caste.trim().toLowerCase();
+      if (!isCasteMatch) reasons.push(`Caste Mismatch: "${target.caste}" vs "${candidate.caste}"`);
+      const male = target.gender === 'Male' ? target : candidate;
+      const female = target.gender === 'Female' ? target : candidate;
+      let isHeightValid = false, isEducationValid = false;
+      if (male && female && isGenderComplementary) {
+        isHeightValid = male.heightInches > female.heightInches;
+        if (!isHeightValid) reasons.push(`Height: Groom (${male.heightDisplay}) must be taller than Bride (${female.heightDisplay})`);
+        isEducationValid = male.educationTier >= female.educationTier;
+        if (!isEducationValid) reasons.push(`Education: Groom (Tier ${male.educationTier}) must be ≥ Bride (Tier ${female.educationTier})`);
+      }
+      const isFullMatch = isGenderComplementary && isSectMatch && isCasteMatch && isHeightValid && isEducationValid;
+      return { isFullMatch, reasons, isSectMatch, isCasteMatch, isHeightValid, isEducationValid };
+    }
+
+    function runMatchmaker() {
+      const targetId = document.getElementById('targetCandidateSelect').value;
+      const target = candidates.find(c => c.id === targetId);
+      if (!target) return;
+      const strictOnly = document.getElementById('chkStrictOnly').checked;
+      const pool = candidates.filter(c => c.id !== target.id);
+      const results = [];
+      pool.forEach(c => {
+        const val = validateStrictRules(target, c);
+        if (strictOnly && !val.isFullMatch) return;
+        let score = val.isFullMatch ? 50 : 0;
+        if (val.isFullMatch) {
+          const maleAge = target.gender === 'Male' ? target.age : c.age;
+          const femaleAge = target.gender === 'Female' ? target.age : c.age;
+          const diff = maleAge - femaleAge;
+          if (diff >= 1 && diff <= 4) score += 25;
+          else if (diff >= 0 && diff <= 6) score += 15;
+          if ((target.city||'').toLowerCase() === (c.city||'').toLowerCase()) score += 15;
+          score += 10;
+        }
+        results.push({ candidate: c, validation: val, score: Math.min(100, score) });
+      });
+      results.sort((a,b) => b.score - a.score);
+      document.getElementById('matchResultsCount').innerText = `${results.length} Candidates Evaluated`;
+      const container = document.getElementById('matchingCardsContainer');
+      if (results.length === 0) {
+        container.innerHTML = `<div style="background:#fff;border-radius:12px;padding:30px;text-align:center;border:1px solid #e2e8f0;"><div style="font-size:32px;margin-bottom:8px;">🔍</div><div style="font-weight:700;">No Strict Matches Found</div><div style="font-size:11px;color:#64748b;margin-top:4px;">No candidate cleared all strict rules for ${target.sect}, ${target.caste}.</div><button onclick="document.getElementById('chkStrictOnly').checked=false;runMatchmaker();" style="margin-top:12px;padding:6px 12px;background:#e2e8f0;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">Show Diagnostics</button></div>`;
+        return;
+      }
+      container.innerHTML = results.map(r => {
+        const c = r.candidate;
+        const val = r.validation;
+        return `
+          <div class="match-card ${val.isFullMatch ? 'pass' : 'fail'}">
+            <div class="match-top">
+              <div>
+                <div style="font-weight:700;font-size:14px;">${c.name} (${c.gender})</div>
+                <div style="font-size:11px;color:#64748b;">${c.age} yrs • ${c.heightDisplay} • ${c.city||'-'}</div>
+                ${c.dob ? `<div style="font-size:10px;color:#94a3b8;">DOB: ${c.dob}</div>` : ''}
+              </div>
+              <div class="score-badge ${val.isFullMatch ? 'pass' : 'fail'}">
+                ${val.isFullMatch ? r.score + '%' : 'FAIL'}
+                <span>${val.isFullMatch ? 'MATCH' : 'INELIGIBLE'}</span>
+              </div>
+            </div>
+            <div class="rule-check-grid">
+              <div class="rule-item ${val.isSectMatch ? 'ok' : 'bad'}">${val.isSectMatch ? '✓' : '✗'} Sect: ${c.sect} ${val.isSectMatch ? '(Match)' : '(Mismatch)'}</div>
+              <div class="rule-item ${val.isCasteMatch ? 'ok' : 'bad'}">${val.isCasteMatch ? '✓' : '✗'} Caste: ${c.caste} ${val.isCasteMatch ? '(Match)' : '(Mismatch)'}</div>
+              <div class="rule-item ${val.isHeightValid ? 'ok' : 'bad'}">${val.isHeightValid ? '✓' : '✗'} Height: Groom must be taller than Bride</div>
+              <div class="rule-item ${val.isEducationValid ? 'ok' : 'bad'}">${val.isEducationValid ? '✓' : '✗'} Education: Groom tier ≥ Bride tier</div>
+            </div>
+            ${!val.isFullMatch ? `<div style="background:#fee2e2;color:#b91c1c;font-size:10px;padding:6px;border-radius:6px;margin-bottom:8px;font-weight:600;">${val.reasons.join(' • ')}</div>` : ''}
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:11px;color:#64748b;">Ref: ${c.agentReferenceName}</span>
+              ${val.isFullMatch ? `<button onclick="createProposal('${target.id}','${c.id}')" style="background:#047857;color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🚀 Create Proposal</button>` : `<span style="font-size:11px;color:#ef4444;font-weight:600;">Disqualified</span>`}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function createProposal(idA, idB) {
+      const a = candidates.find(c => c.id === idA);
+      const b = candidates.find(c => c.id === idB);
+      const male = a.gender === 'Male' ? a : b;
+      const female = a.gender === 'Female' ? a : b;
+      proposals.push({
+        id: `prop-${Date.now()}`,
+        maleId: male.id, femaleId: female.id,
+        maleName: male.name, femaleName: female.name,
+        sect: male.sect, caste: male.caste,
+        stage: "proposal_sent",
+        notes: `Proposal dispatched on ${new Date().toLocaleDateString()}.`
+      });
+      alert(`Proposal between ${male.name} and ${female.name} created!`);
+      switchTab('pipeline');
+    }
+
+    // ===================== PIPELINE =====================
+    function renderPipeline() {
+      const board = document.getElementById('pipelineBoard');
+      board.innerHTML = stages.map(stage => {
+        const items = proposals.filter(p => p.stage === stage.key);
+        return `
+          <div class="pipeline-stage-box">
+            <div class="stage-header" style="background:${stage.color};">
+              <span>${stage.label}</span>
+              <span style="background:rgba(255,255,255,0.25);padding:2px 8px;border-radius:12px;font-size:11px;">${items.length}</span>
+            </div>
+            <div class="stage-items">
+              ${items.length === 0 ? '<div style="font-size:11px;color:#94a3b8;text-align:center;padding:10px;">No proposals</div>' : ''}
+              ${items.map(p => `
+                <div class="proposal-card">
+                  <div class="proposal-pair"><span>👨 ${p.maleName}</span><span style="color:#64748b;">🤝</span><span>🧕 ${p.femaleName}</span></div>
+                  <div style="font-size:11px;color:#64748b;">Sect: ${p.sect} • Caste: ${p.caste}</div>
+                  <div style="font-size:11px;color:#334155;margin-top:4px;">"${p.notes}"</div>
+                  <div class="proposal-actions">
+                    <span style="font-size:10px;color:#94a3b8;">NikahBureau Pro</span>
+                    <button class="btn-advance" onclick="advanceStage('${p.id}')">Advance Stage ➔</button>
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function advanceStage(propId) {
+      const p = proposals.find(item => item.id === propId);
+      if (!p) return;
+      const order = ["pending_review", "proposal_sent", "family_discussion", "shortlisted", "closed"];
+      const idx = order.indexOf(p.stage);
+      p.stage = order[(idx + 1) % order.length];
+      p.notes += ` | Advanced to ${p.stage} on ${new Date().toLocaleTimeString()}`;
+      renderPipeline();
+      updateStats();
+    }
+
+    // ===================== NAV =====================
+    function setMode(mode) {
+      const vp = document.getElementById('appViewport');
+      document.getElementById('btnPhoneView').classList.toggle('active', mode === 'phone');
+      document.getElementById('btnDesktopView').classList.toggle('active', mode === 'desktop');
+      vp.classList.toggle('desktop-mode', mode === 'desktop');
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-tab').forEach((t, i) => {
+        t.classList.toggle('active', ['profiles','scanner','matchmaker','pipeline'][i] === tabId);
+      });
+      document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+      document.getElementById(`view-${tabId}`).classList.add('active');
+      if (tabId === 'matchmaker') { populateTargetSelect(); runMatchmaker(); }
+      else if (tabId === 'pipeline') renderPipeline();
+      else if (tabId === 'profiles') renderProfiles();
+    }
+
+    // Close modal on overlay click
+    document.getElementById('profileModal').addEventListener('click', function(e) {
+      if (e.target === this) closeProfileModal();
+    });
+
+    // Init
     renderProfiles();
   </script>
 </body>
