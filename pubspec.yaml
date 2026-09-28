@@ -1,7 +1,7 @@
 name: rishta_agent_app
 description: "Offline Android App for Muslim Marriage Bureaus and Rishta Agents"
 publish_to: "none"
-version: 1.4.0+5
+version: 1.4.1+6
 
 environment:
   sdk: ">=3.0.0 <4.0.0"

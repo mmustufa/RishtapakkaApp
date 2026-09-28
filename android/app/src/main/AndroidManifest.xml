@@ -1,5 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.NikahPakka.rishta_agent_app">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Offline Camera and Storage Permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
