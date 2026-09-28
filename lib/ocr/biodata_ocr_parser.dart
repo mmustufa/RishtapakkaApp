@@ -133,7 +133,10 @@ class BiodataOcrParser {
         .where((l) => l.isNotEmpty)
         .toList();
 
-    final name = _extractName(lines, rawOcrText);
+    final family = _extractFamilyInfo(lines, rawOcrText);
+    final cutoff = family.cutoff;
+
+    final name = _extractName(lines, rawOcrText, cutoff);
     final gender = _extractGender(lines, rawOcrText);
     final dob = _extractDob(lines, rawOcrText);
     final age = _extractAge(lines, rawOcrText, dob);
@@ -142,15 +145,15 @@ class BiodataOcrParser {
     final complexion = _extractComplexion(lines, rawOcrText);
     final education = _extractEducation(lines, rawOcrText);
     final educationTier = EducationTier.fromString(education);
-    final occupation = _extractOccupation(lines, rawOcrText);
+    final occupation = _extractOccupation(lines, rawOcrText, cutoff);
     final sect = _extractSect(lines, rawOcrText);
     final caste = _extractCaste(lines, rawOcrText);
     final city = _extractCity(lines, rawOcrText);
     final address = _extractAddress(lines, rawOcrText);
     final contact = _extractContact(lines, rawOcrText);
-    final fatherName = _extractFatherName(lines, rawOcrText);
-    final fatherOcc = _extractFatherOccupation(lines, rawOcrText);
-    final motherName = _extractMotherName(lines, rawOcrText);
+    final fatherName = family.fatherName;
+    final fatherOcc = family.fatherOccupation;
+    final motherName = family.motherName;
     final agent = _extractAgentReference(lines, rawOcrText);
 
     return ParsedBiodataResult(
@@ -182,17 +185,21 @@ class BiodataOcrParser {
   // ─────────────────────────────────────────────
   // NAME — label-based, then fallback heuristic
   // ─────────────────────────────────────────────
-  static String _extractName(List<String> lines, String fullText) {
-    // 1. Label-based: "Full Name:", "Name:", "Candidate Name:"
+  static String _extractName(List<String> lines, String fullText, [int cutoffIndex = -1]) {
+    final candidateLines = (cutoffIndex > 0) ? lines.sublist(0, cutoffIndex) : lines;
+    final candidateText = candidateLines.join('\n');
+
+    // 1. Label-based: "Candidate Name:", "Boy Name:", "Girl Name:", "Full Name:", "Name:"
+    // Ensure negative lookbehinds so "Father's Name:" or "Mother's Name:" never match
     final labelPatterns = [
-      RegExp(r'(?:full\s*name|name)\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{2,40})', caseSensitive: false),
-      RegExp("(?:candidate|applicant|boy|girl|bride|groom)\\s*(?:'s\\s*)?name\\s*[:\\-|]\\s*([A-Za-z][A-Za-z\\s\\.]{2,40})", caseSensitive: false),
+      RegExp(r'(?:candidate(?:\x27s)?|applicant|boy(?:\x27s)?|girl(?:\x27s)?|bride(?:\x27s)?|groom(?:\x27s)?)\s*name\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{2,40})', caseSensitive: false),
+      RegExp(r'(?:full\s*name)\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{2,40})', caseSensitive: false),
+      RegExp(r'(?<!father\s*)(?<!father\x27s\s*)(?<!mother\s*)(?<!mother\x27s\s*)(?<!brother\s*)(?<!sister\s*)\bname\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{2,40})', caseSensitive: false),
     ];
     for (final pat in labelPatterns) {
-      final m = pat.firstMatch(fullText);
+      final m = pat.firstMatch(candidateText);
       if (m != null) {
         var val = m.group(1)!.trim();
-        // Stop at first digit, newline, or stop-keyword
         val = val.split(RegExp(r'[\n\r\d]|(?:\b(?:date|age|height|gender|dob|marital|born|s\/o|d\/o)\b)', caseSensitive: false)).first.trim();
         val = val.replaceAll(RegExp(r'[^\w\s\.]'), '').trim();
         if (val.split(RegExp(r'\s+')).length >= 2 && val.length > 4) {
@@ -201,14 +208,13 @@ class BiodataOcrParser {
       }
     }
 
-    // 2. Fallback: first short ALL-CAPS or title-case line that looks like a name
-    for (final line in lines.take(15)) {
+    // 2. Fallback: first short line in candidate lines that looks like a person's name
+    for (final line in candidateLines.take(15)) {
       final trimmed = line.trim();
       if (trimmed.length < 4 || trimmed.length > 40) continue;
-      // Skip section headings
       final lower = trimmed.toLowerCase();
       if (_sectionHeadings.any((h) => lower.contains(h))) continue;
-      // Skip lines with digits or special chars
+      if (RegExp(r'\b(?:father|mother|brother|sister|qualification|education|height|weight)\b', caseSensitive: false).hasMatch(lower)) continue;
       if (RegExp(r'[\d:@#\-\/|(){}[\]]').hasMatch(trimmed)) continue;
       final words = trimmed.split(RegExp(r'\s+'));
       if (words.length >= 2 && words.length <= 5) {
@@ -368,18 +374,38 @@ class BiodataOcrParser {
   }
 
   // ─────────────────────────────────────────────
-  // OCCUPATION
+  // OCCUPATION — Candidate-only scope (strictly excludes father/family lines)
   // ─────────────────────────────────────────────
-  static String _extractOccupation(List<String> lines, String fullText) {
-    final patterns = [
-      RegExp(r'(?:occupation|profession|job|working\s*as|employed\s*as)\s*[:\-|]\s*([^\n\r]{4,80})', caseSensitive: false),
-    ];
-    for (final pat in patterns) {
-      final m = pat.firstMatch(fullText);
+  static String _extractOccupation(List<String> lines, String fullText, [int cutoffIndex = -1]) {
+    // Only search lines strictly before the father/family section
+    final candidateLines = (cutoffIndex > 0) ? lines.sublist(0, cutoffIndex) : lines;
+
+    // 1. Search candidate lines for explicit candidate occupation/profession/job
+    for (final line in candidateLines) {
+      final m = RegExp(
+        r'(?:candidate(?:\x27s)?\s*occupation|boy(?:\x27s)?\s*occupation|girl(?:\x27s)?\s*occupation|occupation|profession|job|designation|working\s*as|employed\s*as|work\s*as)\s*[:\-|]\s*([^\n\r]{3,80})',
+        caseSensitive: false,
+      ).firstMatch(line);
       if (m != null) {
-        return m.group(1)!.trim().split('\n').first.trim();
+        final occ = m.group(1)!.trim().replaceAll(RegExp(r'[^\w\s\.\(\)\/\-]'), '').trim();
+        if (occ.isNotEmpty) return _toTitleCase(occ);
       }
     }
+
+    // 2. Search for company / working at
+    for (final line in candidateLines) {
+      final m = RegExp(
+        r'(?:working\s*at|employed\s*at|company)\s*[:\-|]\s*([^\n\r]{3,80})',
+        caseSensitive: false,
+      ).firstMatch(line);
+      if (m != null) {
+        final occ = m.group(1)!.trim();
+        if (occ.isNotEmpty) return _toTitleCase(occ);
+      }
+    }
+
+    // Candidate has no explicit occupation in candidate section -> return empty
+    // NEVER fall back to lines under Father/Family section!
     return '';
   }
 
@@ -483,33 +509,123 @@ class BiodataOcrParser {
   }
 
   // ─────────────────────────────────────────────
-  // FATHER NAME
+  // FAMILY DETAILS (Father Name, Father Occupation, Mother Name)
   // ─────────────────────────────────────────────
-  static String _extractFatherName(List<String> lines, String fullText) {
-    final pat = RegExp(r"father'?s?\s*name\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{3,40})", caseSensitive: false);
-    final m = pat.firstMatch(fullText);
-    if (m != null) return m.group(1)!.trim().split('\n').first.trim();
-    return '';
-  }
+  static _FamilyInfo _extractFamilyInfo(List<String> lines, String fullText) {
+    int fatherIdx = -1;
+    int motherIdx = -1;
+    int familySectionIdx = -1;
 
-  // ─────────────────────────────────────────────
-  // FATHER OCCUPATION
-  // ─────────────────────────────────────────────
-  static String _extractFatherOccupation(List<String> lines, String fullText) {
-    final pat = RegExp(r"father'?s?\s*(?:occupation|profession|job)\s*[:\-|]\s*(.{4,60})", caseSensitive: false);
-    final m = pat.firstMatch(fullText);
-    if (m != null) return m.group(1)!.trim().split('\n').first.trim();
-    return '';
-  }
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i].trim();
+      final lower = line.toLowerCase();
+      if (familySectionIdx == -1 &&
+          RegExp(r'^\s*(?:family\s*(?:details|background|info)|parents?\s*(?:details|info))\b', caseSensitive: false).hasMatch(lower)) {
+        familySectionIdx = i;
+      }
+      if (fatherIdx == -1 &&
+          (RegExp(r'\b(?:father(?:\x27s)?(?:\s*name)?|father)\b\s*[:\-|]', caseSensitive: false).hasMatch(line) ||
+           RegExp(r'^\s*father(?:\x27s)?\s*[:\-|]', caseSensitive: false).hasMatch(line) ||
+           RegExp(r'\b(?:s\/o|son\s+of)\b\s*[:\-|]?', caseSensitive: false).hasMatch(line))) {
+        fatherIdx = i;
+      }
+      if (motherIdx == -1 &&
+          (RegExp(r'\b(?:mother(?:\x27s)?(?:\s*name)?|mother)\b\s*[:\-|]', caseSensitive: false).hasMatch(line) ||
+           RegExp(r'^\s*mother(?:\x27s)?\s*[:\-|]', caseSensitive: false).hasMatch(line) ||
+           RegExp(r'\b(?:d\/o|daughter\s+of)\b\s*[:\-|]?', caseSensitive: false).hasMatch(line))) {
+        motherIdx = i;
+      }
+    }
 
-  // ─────────────────────────────────────────────
-  // MOTHER NAME
-  // ─────────────────────────────────────────────
-  static String _extractMotherName(List<String> lines, String fullText) {
-    final pat = RegExp(r"mother'?s?\s*name\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{3,40})", caseSensitive: false);
-    final m = pat.firstMatch(fullText);
-    if (m != null) return m.group(1)!.trim().split('\n').first.trim();
-    return '';
+    String fatherName = '';
+    String fatherOcc = '';
+    String motherName = '';
+
+    // Extract Father Name & inline occupation
+    if (fatherIdx != -1) {
+      final line = lines[fatherIdx];
+      final m = RegExp(r'(?:father(?:\x27s)?(?:\s*name)?|father|s\/o|son\s+of)\s*[:\-|]?\s*([^\n\r]+)', caseSensitive: false).firstMatch(line);
+      if (m != null) {
+        final rawFather = m.group(1)!.trim();
+        // Check for parenthesized occupation e.g. "Abdul Qadir (Project Engineer)"
+        final paren = RegExp(r'^([^\(\)]+)\s*\((.+)\)$').firstMatch(rawFather);
+        if (paren != null) {
+          fatherName = paren.group(1)!.trim();
+          fatherOcc = paren.group(2)!.trim();
+        } else {
+          final dash = RegExp(r'^([^\-]+)\s*-\s*([A-Za-z\s]+)$').firstMatch(rawFather);
+          if (dash != null && dash.group(2)!.trim().length > 3) {
+            fatherName = dash.group(1)!.trim();
+            fatherOcc = dash.group(2)!.trim();
+          } else {
+            fatherName = rawFather;
+          }
+        }
+      }
+
+      // Check next 1-3 lines for Father's Occupation if not found inline
+      // South Asian biodatas commonly put "Occupation: Project Engineer" right below Father Name
+      if (fatherOcc.isEmpty) {
+        for (int j = fatherIdx + 1; j < lines.length && j <= fatherIdx + 3; j++) {
+          final nextLine = lines[j].trim();
+          // Stop if reached mother or next section
+          if (RegExp(r'\b(?:mother|siblings?|brothers?|sisters?|address|contact|phone)\b', caseSensitive: false).hasMatch(nextLine)) {
+            break;
+          }
+          final occMatch = RegExp(
+            r'^(?:occupation|profession|job|designation|business|working\s*as|service)\s*[:\-|]\s*(.+)$',
+            caseSensitive: false,
+          ).firstMatch(nextLine);
+          if (occMatch != null) {
+            fatherOcc = occMatch.group(1)!.trim();
+            break;
+          }
+          final jobMatch = RegExp(
+            r'^(?:businessman|business|govt\s*employee|govt\s*service|private\s*service|project\s*engineer|civil\s*engineer|engineer|doctor|teacher|professor|advocate|lawyer|farmer|agriculturist|retired|contractor|merchant|self\s*employed)$',
+            caseSensitive: false,
+          ).firstMatch(nextLine);
+          if (jobMatch != null) {
+            fatherOcc = jobMatch.group(0)!.trim();
+            break;
+          }
+        }
+      }
+    } else {
+      // Fallback single line regex
+      final pat = RegExp(r"father'?s?\s*name\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{3,40})", caseSensitive: false);
+      final m = pat.firstMatch(fullText);
+      if (m != null) fatherName = m.group(1)!.trim().split('\n').first.trim();
+
+      final occPat = RegExp(r"father'?s?\s*(?:occupation|profession|job)\s*[:\-|]\s*(.{4,60})", caseSensitive: false);
+      final om = occPat.firstMatch(fullText);
+      if (om != null) fatherOcc = om.group(1)!.trim().split('\n').first.trim();
+    }
+
+    // Extract Mother Name
+    if (motherIdx != -1) {
+      final line = lines[motherIdx];
+      final m = RegExp(r'(?:mother(?:\x27s)?(?:\s*name)?|mother|d\/o|daughter\s+of)\s*[:\-|]?\s*([^\n\r]+)', caseSensitive: false).firstMatch(line);
+      if (m != null) {
+        motherName = m.group(1)!.trim().split(RegExp(r'[\(\-]')).first.trim();
+      }
+    } else {
+      final pat = RegExp(r"mother'?s?\s*name\s*[:\-|]\s*([A-Za-z][A-Za-z\s\.]{3,40})", caseSensitive: false);
+      final m = pat.firstMatch(fullText);
+      if (m != null) motherName = m.group(1)!.trim().split('\n').first.trim();
+    }
+
+    // Clean special chars & format
+    fatherName = fatherName.replaceAll(RegExp(r'[^\w\s\.]'), '').trim();
+    motherName = motherName.replaceAll(RegExp(r'[^\w\s\.]'), '').trim();
+    fatherOcc = fatherOcc.replaceAll(RegExp(r'[^\w\s\.\(\)\/\-]'), '').trim();
+
+    return _FamilyInfo(
+      fatherName: _toTitleCase(fatherName),
+      fatherOccupation: _toTitleCase(fatherOcc),
+      motherName: _toTitleCase(motherName),
+      fatherLineIndex: fatherIdx,
+      familySectionIndex: familySectionIdx,
+    );
   }
 
   // ─────────────────────────────────────────────
@@ -569,4 +685,29 @@ class _HeightResult {
   final double inches;
   final String display;
   _HeightResult(this.inches, this.display);
+}
+
+class _FamilyInfo {
+  final String fatherName;
+  final String fatherOccupation;
+  final String motherName;
+  final int fatherLineIndex;
+  final int familySectionIndex;
+
+  _FamilyInfo({
+    this.fatherName = '',
+    this.fatherOccupation = '',
+    this.motherName = '',
+    this.fatherLineIndex = -1,
+    this.familySectionIndex = -1,
+  });
+
+  int get cutoff {
+    if (familySectionIndex != -1 && fatherLineIndex != -1) {
+      return familySectionIndex < fatherLineIndex ? familySectionIndex : fatherLineIndex;
+    }
+    if (familySectionIndex != -1) return familySectionIndex;
+    if (fatherLineIndex != -1) return fatherLineIndex;
+    return -1;
+  }
 }

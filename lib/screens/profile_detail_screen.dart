@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../database/app_database.dart';
 import '../models/candidate.dart';
 import '../models/pipeline_stage.dart';
+import '../utils/share_helper.dart';
 import '../widgets/status_badge.dart';
 import 'candidate_matches_screen.dart';
 import 'edit_candidate_screen.dart';
@@ -60,58 +61,16 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     }
   }
 
-  // ─── Share profile text on WhatsApp ───
+  // ─── Share profile + photos via WhatsApp / system share ───
   Future<void> _shareOnWhatsApp() async {
-    final c = _candidate!;
-    final photos = c.allPhotos;
-    final photoNote = photos.isNotEmpty
-        ? '\n📸 ${photos.length} photo(s) available — ask agent to send separately.'
-        : '';
-    final text = '💍 *NikkahPakkah — Rishta Profile*\n\n'
-        '*Name:* ${c.name}\n'
-        '*Gender:* ${c.gender}\n'
-        '${c.dob.isNotEmpty ? "*Date of Birth:* ${c.dob}\n" : ""}'
-        '*Age:* ${c.age} years\n'
-        '*Height:* ${c.heightDisplay}\n'
-        '${c.complexion.isNotEmpty ? "*Complexion:* ${c.complexion}\n" : ""}'
-        '*Sect:* ${c.sect}\n'
-        '*Caste:* ${c.caste}\n'
-        '*Education:* ${c.education}\n'
-        '${c.occupation.isNotEmpty ? "*Occupation:* ${c.occupation}\n" : ""}'
-        '${c.fatherName.isNotEmpty ? "*Father:* ${c.fatherName}\n" : ""}'
-        '${c.fatherOccupation.isNotEmpty ? "*Father\'s Occ:* ${c.fatherOccupation}\n" : ""}'
-        '${c.motherName.isNotEmpty ? "*Mother:* ${c.motherName}\n" : ""}'
-        '${c.city.isNotEmpty ? "*City:* ${c.city}\n" : ""}'
-        '${c.address.isNotEmpty ? "*Address:* ${c.address}\n" : ""}'
-        '${c.contactNumber.isNotEmpty ? "*Contact:* ${c.contactNumber}\n" : ""}'
-        '*Reference:* ${c.agentReferenceName}'
-        '$photoNote\n\n'
-        '_Shared via NikkahPakkah · Confidential_';
-
-    final encoded = Uri.encodeComponent(text);
-    final url = Uri.parse('https://wa.me/?text=$encoded');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('WhatsApp not found on this device.')),
-        );
-      }
-    }
+    if (_candidate == null) return;
+    await ShareHelper.shareCandidateWithPhotos(context, _candidate!);
   }
 
-  // ─── Share/view individual photo ───
+  // ─── Share individual photo ───
   Future<void> _sharePhoto(String photoPath) async {
-    // On Android: open the image file with the share intent via url_launcher
-    final uri = Uri.file(photoPath);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Photo saved at: $photoPath\nForward it manually on WhatsApp.')),
-      );
-    }
+    if (_candidate == null) return;
+    await ShareHelper.shareSinglePhoto(context, photoPath, _candidate!.name);
   }
 
   @override
@@ -137,7 +96,13 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
+            icon: const Icon(Icons.share_rounded),
+            tooltip: 'Share Options',
+            onPressed: () => ShareHelper.showShareOptions(context, c),
+          ),
+          IconButton(
             icon: const Icon(Icons.edit_rounded),
+            tooltip: 'Edit Profile',
             onPressed: () async {
               final result = await Navigator.push(
                 context,
@@ -146,7 +111,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
               if (result == true) _loadCandidate();
             },
           ),
-          IconButton(icon: const Icon(Icons.delete_outline_rounded), onPressed: _deleteCandidate),
+          IconButton(
+            icon: const Icon(Icons.delete_outline_rounded),
+            tooltip: 'Delete Profile',
+            onPressed: _deleteCandidate,
+          ),
         ],
       ),
       bottomNavigationBar: SafeArea(

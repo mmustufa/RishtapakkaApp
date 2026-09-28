@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -712,13 +712,85 @@
       }
 
       // ---- OCCUPATION ----
-      const occPatterns = [
-        /(?:occupation|profession|job|work(?:ing\s*as)?)\s*[:\-\|]\s*(.+?)(?=\n|father|mother|city|address|contact)/i,
-        /(?:occupation|profession)\s*[:\-\|]\s*(.{4,80})/i
-      ];
-      for (const pat of occPatterns) {
-        const m = fullText.match(pat);
-        if (m) { result.occupation = m[1].trim().replace(/\s+/g, ' ').substring(0, 80); break; }
+      // ---- FAMILY DETAILS & FATHER OCCUPATION ----
+      let fatherLineIdx = -1;
+      let familySectionIdx = -1;
+      let motherLineIdx = -1;
+      lines.forEach((l, idx) => {
+        if (familySectionIdx === -1 && /^\s*(?:family\s*(?:details|background|info)|parents?\s*(?:details|info))\b/i.test(l)) familySectionIdx = idx;
+        if (fatherLineIdx === -1 && (/\b(?:father(?:'s)?(?:\s*name)?|father)\b\s*[:\-|]/i.test(l) || /^\s*father(?:'s)?\s*[:\-|]/i.test(l) || /\b(?:s\/o|son\s+of)\b\s*[:\-|]?/i.test(l))) fatherLineIdx = idx;
+        if (motherLineIdx === -1 && (/\b(?:mother(?:'s)?(?:\s*name)?|mother)\b\s*[:\-|]/i.test(l) || /^\s*mother(?:'s)?\s*[:\-|]/i.test(l) || /\b(?:d\/o|daughter\s+of)\b\s*[:\-|]?/i.test(l))) motherLineIdx = idx;
+      });
+
+      const cutoff = (familySectionIdx !== -1 && fatherLineIdx !== -1)
+        ? Math.min(familySectionIdx, fatherLineIdx)
+        : (familySectionIdx !== -1 ? familySectionIdx : fatherLineIdx);
+
+      // Extract Father details
+      if (fatherLineIdx !== -1) {
+        const line = lines[fatherLineIdx];
+        const fm = line.match(/(?:father(?:'s)?(?:\s*name)?|father|s\/o|son\s+of)\s*[:\-|]?\s*([^\n\r]+)/i);
+        if (fm) {
+          const rawFather = fm[1].trim();
+          const paren = rawFather.match(/^([^\(\)]+)\s*\((.+)\)$/);
+          if (paren) {
+            result.fatherName = paren[1].trim();
+            result.fatherOcc = paren[2].trim();
+          } else {
+            result.fatherName = rawFather;
+          }
+        }
+        // South Asian biodatas put "Occupation: Project Engineer" right below Father Name
+        if (!result.fatherOcc) {
+          for (let j = fatherLineIdx + 1; j < lines.length && j <= fatherLineIdx + 3; j++) {
+            const nextLine = lines[j].trim();
+            if (/\b(?:mother|siblings?|brothers?|sisters?|address|contact|phone)\b/i.test(nextLine)) break;
+            const om = nextLine.match(/^(?:occupation|profession|job|designation|business|working\s*as|service)\s*[:\-|]\s*(.+)$/i);
+            if (om) { result.fatherOcc = om[1].trim(); break; }
+            if (/^(?:businessman|business|govt\s*employee|govt\s*service|private\s*service|project\s*engineer|civil\s*engineer|engineer|doctor|teacher|professor|advocate|lawyer|farmer|agriculturist|retired|contractor|merchant|self\s*employed)$/i.test(nextLine)) {
+              result.fatherOcc = nextLine;
+              break;
+            }
+          }
+        }
+      } else {
+        const fatherPat = /father'?s?\s*name\s*[:\-\|]\s*([A-Za-z][A-Za-z\s]{3,40})/i;
+        const fatherM = fullText.match(fatherPat);
+        if (fatherM) result.fatherName = fatherM[1].trim().split('\n')[0].trim();
+
+        const fatherOccPat = /father'?s?\s*(?:occupation|profession|job)\s*[:\-\|]\s*(.{4,60})/i;
+        const fatherOccM = fullText.match(fatherOccPat);
+        if (fatherOccM) result.fatherOcc = fatherOccM[1].trim().split('\n')[0].trim();
+      }
+
+      // Extract Mother Name
+      if (motherLineIdx !== -1) {
+        const line = lines[motherLineIdx];
+        const mm = line.match(/(?:mother(?:'s)?(?:\s*name)?|mother|d\/o|daughter\s+of)\s*[:\-|]?\s*([^\n\r]+)/i);
+        if (mm) result.motherName = mm[1].trim().split(/[\(\-]/)[0].trim();
+      } else {
+        const motherPat = /mother'?s?\s*name\s*[:\-\|]\s*([A-Za-z][A-Za-z\s]{3,40})/i;
+        const motherM = fullText.match(motherPat);
+        if (motherM) result.motherName = motherM[1].trim().split('\n')[0].trim();
+      }
+
+      // ---- CANDIDATE OCCUPATION (Strictly lines BEFORE father/family cutoff) ----
+      const candidateLines = cutoff > 0 ? lines.slice(0, cutoff) : lines;
+      for (const cl of candidateLines) {
+        const cm = cl.match(/(?:candidate(?:'s)?\s*occupation|boy(?:'s)?\s*occupation|girl(?:'s)?\s*occupation|occupation|profession|job|designation|working\s*as|employed\s*as|work\s*as)\s*[:\-|]\s*(.+)$/i);
+        if (cm) {
+          result.occupation = cm[1].trim().replace(/\s+/g, ' ').substring(0, 80);
+          break;
+        }
+      }
+      if (!result.occupation) {
+        for (const cl of candidateLines) {
+          const cm = cl.match(/(?:working\s*at|employed\s*at|company)\s*[:\-|]\s*(.+)$/i);
+          if (cm) {
+            result.occupation = cm[1].trim().replace(/\s+/g, ' ').substring(0, 80);
+            break;
+          }
+        }
       }
 
       // ---- CITY ----
@@ -733,21 +805,6 @@
           break;
         }
       }
-
-      // ---- FATHER NAME ----
-      const fatherPat = /father'?s?\s*name\s*[:\-\|]\s*([A-Za-z][A-Za-z\s]{3,40})/i;
-      const fatherM = fullText.match(fatherPat);
-      if (fatherM) result.fatherName = fatherM[1].trim().split('\n')[0].trim();
-
-      // ---- FATHER OCCUPATION ----
-      const fatherOccPat = /father'?s?\s*(?:occupation|profession|job)\s*[:\-\|]\s*(.{4,60})/i;
-      const fatherOccM = fullText.match(fatherOccPat);
-      if (fatherOccM) result.fatherOcc = fatherOccM[1].trim().split('\n')[0].trim();
-
-      // ---- MOTHER NAME ----
-      const motherPat = /mother'?s?\s*name\s*[:\-\|]\s*([A-Za-z][A-Za-z\s]{3,40})/i;
-      const motherM = fullText.match(motherPat);
-      if (motherM) result.motherName = motherM[1].trim().split('\n')[0].trim();
 
       // ---- ADDRESS ----
       const addressPat = /(?:house\s*address|residential\s*address|address)\s*[:\-\|]\s*(.{10,120})/i;
@@ -1176,7 +1233,7 @@
       const photoNote = (c.photos && c.photos.length > 0)
         ? `\n📸 _${c.photos.length} photo(s) available — download separately from the app._`
         : '';
-      const text = `*💍 NikahPakka Pro — Rishta Profile*\n\n` +
+      const text = `*💍 NikkahPakkah — Rishta Profile*\n\n` +
         `*Name:* ${c.name}\n` +
         `*Gender:* ${c.gender}\n` +
         (c.dob ? `*Date of Birth:* ${c.dob}\n` : '') +
@@ -1188,13 +1245,13 @@
         `*Education:* ${c.education}\n` +
         (c.occupation ? `*Occupation:* ${c.occupation}\n` : '') +
         (c.fatherName ? `*Father:* ${c.fatherName}\n` : '') +
-        (c.fatherOcc ? `*Father's Occ:* ${c.fatherOcc}\n` : '') +
+        (c.fatherOcc ? `*Father's Occupation:* ${c.fatherOcc}\n` : '') +
         (c.motherName ? `*Mother:* ${c.motherName}\n` : '') +
         (c.city ? `*City:* ${c.city}\n` : '') +
         (c.address ? `*Address:* ${c.address}\n` : '') +
         (c.contactNumber ? `*Contact:* ${c.contactNumber}\n` : '') +
         `*Reference:* ${c.agentReferenceName}\n` +
-        photoNote + `\n\n_Shared via NikahPakka Pro · Confidential_`;
+        photoNote + `\n\n_Shared via NikkahPakkah · Confidential_`;
 
       const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
